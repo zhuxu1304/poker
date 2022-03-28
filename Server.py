@@ -5,7 +5,7 @@ import time
 
 
 
-class Client(Socket_function):
+class Player(Socket_function):
     def __init__(self, port):
         self.s = socket.socket()
         self.s.bind((socket.gethostname(), port))
@@ -19,9 +19,15 @@ class Client(Socket_function):
     def run(self):
         print(self.name,self.empfangeStr(self.komm_s))
 
+    def send(self,message):
+        pass
+
 class Game():
-    def __init__(self)
+    def __init__(self):
         self.clients = []
+
+    def add_player(self,player):
+        self.clients.append(player)
 
     def run(self):
         while True:
@@ -39,14 +45,14 @@ class Server(Socket_function):
 
     def run(self):
         #welcome server
-        while len(self.clients)<5:
+        while len(self.game.clients)<2:
             komm_s, adress = self.welcome_socket.accept()
             print(1)            
             with socketserver.TCPServer(("localhost", 0), None) as s:
                 free_port = s.server_address[1]
             self.sendeStr(komm_s, str(free_port))
             komm_s.close()
-            self.game.clients.append(Client(free_port))
+            self.game.add_player(Player(free_port))
         self.welcome_socket.close()
         # Spiel
         self.game.run()
