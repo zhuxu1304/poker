@@ -12,12 +12,14 @@ class Player(Socket_function):
         self.komm_s, self.adress = self.s.accept()
         self.sendeStr(self.komm_s, "what's your name?")
         self.name = self.empfangeStr(self.komm_s)
-        self.sendeStr(self.s, "waiting for other players")
+        self.sendeStr(self.komm_s, "waiting for other players")
 
         self.money = 1000
-
+        self.cards = []
         print(self.name)
 
+    def set_cards(self,cards):
+        self.cards = cards
     def run(self):
         print(self.name, self.empfangeStr(self.komm_s))
 
