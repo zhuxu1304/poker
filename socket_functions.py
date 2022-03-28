@@ -1,17 +1,19 @@
 import socket
 import socketserver
 import time
+
+
 class Socket_function():
-    def sendeStr(self,komm_s, datenStr):
+    def sendeStr(self, komm_s, datenStr):
         datenBytes = bytes(datenStr, 'utf-8')
         komm_s.sendall(datenBytes)
         self.sendeTrennByte(komm_s)
 
-    def sendeTrennByte(self,komm_s):
+    def sendeTrennByte(self, komm_s):
         trennByte = bytes([0])
         komm_s.sendall(trennByte)
 
-    def empfangeStr(self,komm_s):
+    def empfangeStr(self, komm_s):
 
         weiter = True
         datenBytes = bytes()
