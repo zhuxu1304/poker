@@ -3,11 +3,8 @@ import time
 from socket_functions import Socket_function
 
 
-
-
-
 class User(Socket_function):
-    def __init__(self):
+    def __init__(self):  # create socket with welcome port and then a random port
         s = socket.socket()
         s.connect(('127.0.0.1', 5005))
         port = int(self.empfangeStr(s))
@@ -17,11 +14,9 @@ class User(Socket_function):
         self.komm_s.connect(('172.16.0.36', port))
         print(self.empfangeStr(self.komm_s))
         self.name = input()
-        self.sendeStr(self.komm_s,self.name)
+        self.sendeStr(self.komm_s, self.name)
         while True:
-            self.sendeStr(self.komm_s,input("input:"))
-
-
+            self.sendeStr(self.komm_s, input("input:"))
 
 
 user1 = User()
