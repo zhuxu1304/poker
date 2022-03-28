@@ -11,10 +11,12 @@ class User(Socket_function):
         print(port)
         time.sleep(0.1)
         self.komm_s = socket.socket()
-        self.komm_s.connect(('172.16.0.36', port))
+        self.komm_s.connect(('192.168.100.7', port))
         print(self.empfangeStr(self.komm_s))
         self.name = input()
-        self.sendeStr(self.komm_s, self.name)
+        self.sendeStr(self.komm_s, self.name)  # send username
+        print(self.empfangeStr(self.komm_s))  # waiting for other players
+
         while True:
             self.sendeStr(self.komm_s, input("input:"))
 
