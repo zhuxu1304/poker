@@ -177,38 +177,47 @@ class Rules():
 
     def get_highest_combi(self, player_deck, table_deck):
         random_deck = player_deck + table_deck
-        print()
-        print("Zufälliges Karten:", random_deck)
-        print("Karten sortiert anhand ihrem Wert:", sort_cards(random_deck))
+##        print()
+##        print("Zufälliges Karten:", random_deck)
+##        print("Karten sortiert anhand ihrem Wert:", sort_cards(random_deck))
 
         if check_for_royal_flush(random_deck):
-            print("Your highest combination is a Royal Flush:", random_deck[:5])
+            return("Royal Flush", random_deck[:5])
+            ## print("Your highest combination is a Royal Flush:", random_deck[:5])
 
         elif check_for_straight_flush(random_deck)[0]:
-            print("Your highest combination is a Straight Flush:", check_for_straight_flush(random_deck)[1])
+            return("Straight Flush", check_for_straight_flush(random_deck)[1])
+            ## print("Your highest combination is a Straight Flush:", check_for_straight_flush(random_deck)[1])
 
         elif check_for_four_of_a_kind(random_deck)[0]:
-            print("Your highest combination is a Four of a Kind:", check_for_four_of_a_kind(random_deck)[1])
+            return ('Four of a Kind',check_for_four_of_a_kind(random_deck)[1])
+            ## print("Your highest combination is a Four of a Kind:", check_for_four_of_a_kind(random_deck)[1])
 
         elif check_for_fullhouse(random_deck)[0]:
-            print("Your highest combination is a Fullhouse:", check_for_fullhouse(random_deck)[1])
+            return ('Fullhouse',check_for_fullhouse(random_deck)[1])
+            ## print("Your highest combination is a Fullhouse:", check_for_fullhouse(random_deck)[1])
 
         elif check_for_flush(random_deck)[0]:
-            print("Your highest combination is a Flush:", check_for_flush(random_deck)[1])
+            return ('Flush',check_for_flush(random_deck)[1])
+            ## print("Your highest combination is a Flush:", check_for_flush(random_deck)[1])
 
         elif check_for_straight(random_deck)[0]:
-            print("Your highest combination is a Straight:", check_for_straight(random_deck)[1])
+            return ('Straight',check_for_straight(random_deck)[1])
+            ## print("Your highest combination is a Straight:", check_for_straight(random_deck)[1])
 
         elif check_for_three_of_a_kind(random_deck)[0]:
-            print("Your highest combination is a Three of a Kind:", check_for_three_of_a_kind(random_deck)[1])
+            return ('Three of a Kind',check_for_three_of_a_kind(random_deck)[1])
+            ## print("Your highest combination is a Three of a Kind:", check_for_three_of_a_kind(random_deck)[1])
 
         elif check_for_two_pair(random_deck)[0]:
-            print("Your highest combination is a Two Pair:", check_for_two_pair(random_deck)[1])
+            return ('Two Pair',check_for_two_pair(random_deck)[1])
+            ## print("Your highest combination is a Two Pair:", check_for_two_pair(random_deck)[1])
 
         elif check_for_one_pair(random_deck)[0]:
-            print("Your highest combination is a One Pair:", check_for_one_pair(random_deck)[1])
+            return ('One Pair',check_for_one_pair(random_deck)[1])
+            ## print("Your highest combination is a One Pair:", check_for_one_pair(random_deck)[1])
 
         else:
-            print("Your highest card is:", check_for_highcard(random_deck))
+            return ('High Card',check_for_highcard(random_deck))
+            ## print("Your highest card is:", check_for_highcard(random_deck))
 
-        print()
