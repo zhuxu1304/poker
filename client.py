@@ -56,7 +56,7 @@ class User(Socket_function, Rules):
                 elif instruction[0] == '4': # ask for action
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
-                    action = input('enter your choice:')
+                    action = input('enter your choice:')# if bet = 0: check, rasie or fold # if bet != 0: call, rasie or fold
                     if not action:  # [fold,'']
                         self.ingame = False
                         self.sendeStr(json.dumps(action))

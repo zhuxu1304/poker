@@ -1,7 +1,7 @@
-from socket_functions import Socket_function
+import json
 from random import choice
 from rules import Rules
-import json
+from socket_functions import Socket_function
 
 
 class Game(Rules):
@@ -35,6 +35,43 @@ class Game(Rules):
         else:
             self.current_player -= 1
 
+    def get_next_player(self, pos):
+        pos += 1
+        return pos % len(self.players)
+
+    def ask_all_players_for_action(self):
+        pos = self.get_next_player(self.button)
+        while True:
+            if self.players[pos] in self.current_players:
+                small_blind = self.players[pos]
+                for i in len(self.current_players):
+                    if self.current_players[i] == small_blind:
+                        end = i
+                break
+            else:
+                pos = self.get_next_player(pos)
+
+
+
+        self.current_bet = 50
+        while self.current_player != end or len(self.current_players) == 1:
+            action = self.current_players[self.current_player].ask_for_action(self.current_bet)
+            if action[0] == 'fold':
+                self.current_player -= 1
+                del self.current_players[self.current_player]
+            elif action[0] == 'call':
+                self.pot += self.current_bet
+            elif action[0] == 'raise':
+                self.current_bet = action[1]
+                self.pot += self.current_bet
+                end = self.current_player
+            elif action[0] == 'check':
+                pass
+
+            self.set_next_player()
+        if len(self.current_players) == 1:
+            self.winner = self.current_players[0]
+
     def run(self):
         # tell each player to start
         self.send_to_all_player('start')
@@ -42,15 +79,14 @@ class Game(Rules):
         while True:
             # set button, small and big blind+
             button = self.players[self.button]
-            small_blind = self.button + 1
-            big_blind = self.button + 2
+            small_blind = self.get_next_player(self.button)
+            big_blind = self.get_next_player(self.get_next_player(self.button))
 
             # small and big blind pay in the pot+
             self.players[small_blind].change_money(-25)
             self.pot += 25
             self.players[big_blind].change_money(-50)
             self.pot += 50
-
 
             # add player to current_player+
             self.current_players = self.players[:]
@@ -65,14 +101,16 @@ class Game(Rules):
                 player.set_card(cards)
 
             # set first player and first round ask for action+
+            self.winner = None
             self.current_player = big_blind
             self.set_next_player()
             end = big_blind
             self.current_bet = 50
-            while self.current_player != end:
+            while self.current_player != end or len(self.current_players) == 1:
                 action = self.current_players[self.current_player].ask_for_action_firstround(self.current_bet)
                 if action[0] == 'fold':
                     del self.current_players[self.current_player]
+                    self.current_player -= 1
                 elif action[0] == 'call':
                     self.pot += self.current_bet
                 elif action[0] == 'raise':
@@ -81,43 +119,29 @@ class Game(Rules):
                     end = self.current_player
 
                 self.set_next_player()
+            if len(self.current_players) == 1:
+                self.winner = self.current_players[0]
 
-            # reveal 3 cards+
-            print(self.community_cards[:2])
-            self.send_to_all_player('5')
+            if not self.winner:
+                # reveal 3 cards+
+                print(self.community_cards[:2])
+                self.send_to_all_player('5')
 
-            # second round ask for action
-            self.current_player = small_blind
-            self.set_previous_player()
-            end = self.current_player
-            self.set_next_player()
-            self.current_bet = 50
-            while self.current_player != end:
-                action = self.current_players[self.current_player].ask_for_action(self.current_bet)
-                if action[0] == 'fold':
-                    del self.current_players[self.current_player]
-                elif action[0] == 'call':
-                    self.pot += self.current_bet
-                elif action[0] == 'raise':
-                    self.current_bet = action[1]
-                    self.pot += self.current_bet
-                    end = self.current_player
-                elif action[0] == 'check':
-                    pass
+                # second round ask for action+
+                self.ask_all_players_for_action()
 
-                self.set_next_player()
-            # reveal 1 card
+            if not self.winner:
+                # reveal 1 card
 
-            # third round ask for action
-            for player in self.current_players:
-                player.ask_for_action()
+                # third round ask for action
+                self.ask_all_players_for_action()
+            if not self.winner:
+                # reveal 1 card
 
-            # reveal 1 card
-
-            # fourth round ask for action
-            for player in self.current_players:
-                player.ask_for_action()
-
+                # fourth round ask for action
+                self.ask_all_players_for_action()
+            if not self.winner:
+                pass  # find the winner
             # announce winner, give him money in pot
 
             # reset pot, choose new button
