@@ -1,7 +1,7 @@
-from socket_functions import Socket_function
+import json
 from random import choice
 from rules import Rules
-import json
+from socket_functions import Socket_function
 
 
 class Game(Rules):
@@ -13,74 +13,135 @@ class Game(Rules):
         self.button = 0
         self.pot = 0
         self.cards = cards
+        self.current_bet = 0
         self.community_cards = []
 
     def add_player(self, player):
         self.players.append(player)
 
-    def send_to_all_player(self,message):
+    def send_to_all_player(self, message):
         for player in self.players:
             player.send(message)
-            
-    def set_next_player(self): ### wrong!!!
-        if self.current_player < len(self.current_players)-1:
+
+    def set_next_player(self):
+        if self.current_player < len(self.current_players) - 1:
             self.current_player += 1
         else:
             self.current_player = 0
 
+    def set_previous_player(self):
+        if self.current_player <= 0:
+            self.current_player = len(self.current_players)
+        else:
+            self.current_player -= 1
+
+    def get_next_player(self, pos):
+        pos += 1
+        return pos % len(self.players)
+
+    def ask_all_players_for_action(self):
+        pos = self.get_next_player(self.button)
+        while True:
+            if self.players[pos] in self.current_players:
+                small_blind = self.players[pos]
+                for i in len(self.current_players):
+                    if self.current_players[i] == small_blind:
+                        end = i
+                break
+            else:
+                pos = self.get_next_player(pos)
+
+
+
+        self.current_bet = 50
+        while self.current_player != end or len(self.current_players) == 1:
+            action = self.current_players[self.current_player].ask_for_action(self.current_bet)
+            if action[0] == 'fold':
+                self.current_player -= 1
+                del self.current_players[self.current_player]
+            elif action[0] == 'call':
+                self.pot += self.current_bet
+            elif action[0] == 'raise':
+                self.current_bet = action[1]
+                self.pot += self.current_bet
+                end = self.current_player
+            elif action[0] == 'check':
+                pass
+
+            self.set_next_player()
+        if len(self.current_players) == 1:
+            self.winner = self.current_players[0]
+
     def run(self):
         # tell each player to start
         self.send_to_all_player('start')
-            
+
         while True:
             # set button, small and big blind+
             button = self.players[self.button]
-            small_blind = self.button + 1
-            big_blind = self.button + 2
+            small_blind = self.get_next_player(self.button)
+            big_blind = self.get_next_player(self.get_next_player(self.button))
 
             # small and big blind pay in the pot+
-            self.players[small_blind].change_money(-50)
+            self.players[small_blind].change_money(-25)
+            self.pot += 25
+            self.players[big_blind].change_money(-50)
             self.pot += 50
-            self.players[big_blind].change_money(-100)
-            self.pot += 100
 
             # add player to current_player+
-            self.current_player = self.player[:]
-            
+            self.current_players = self.players[:]
+
             # deliever community cards+
             self.cards, self.community_cards = self.get_random_deck(self.cards, 5)
-            self.self.send_to_all_player('1'+json.dumps(self.community_cards))
+            self.self.send_to_all_player('1' + json.dumps(self.community_cards))
 
             # give each player two cards+
             for player in self.players:
                 self.cards, cards = self.get_random_deck(self.cards, 2)
                 player.set_card(cards)
 
+            # set first player and first round ask for action+
+            self.winner = None
+            self.current_player = big_blind
+            self.set_next_player()
+            end = big_blind
+            self.current_bet = 50
+            while self.current_player != end or len(self.current_players) == 1:
+                action = self.current_players[self.current_player].ask_for_action_firstround(self.current_bet)
+                if action[0] == 'fold':
+                    del self.current_players[self.current_player]
+                    self.current_player -= 1
+                elif action[0] == 'call':
+                    self.pot += self.current_bet
+                elif action[0] == 'raise':
+                    self.current_bet = action[1]
+                    self.pot += self.current_bet
+                    end = self.current_player
 
-            # set first player and first round ask for action
-            self.current_player = big_blind +1# wrong!!!
-            for i in len(self.current_players):
-                player.ask_for_action_firstround()
+                self.set_next_player()
+            if len(self.current_players) == 1:
+                self.winner = self.current_players[0]
 
-            # reveal 3 cards
-                print(self.community_cards[:3])
-                
-            # second round ask for action
-            for player in self.current_players:
-                player.ask_for_action()
+            if not self.winner:
+                # reveal 3 cards+
+                print(self.community_cards[:2])
+                self.send_to_all_player('5')
 
-            # reveal 1 card
+                # second round ask for action+
+                self.ask_all_players_for_action()
 
-            # third round ask for action
-            for player in self.current_players:
-                player.ask_for_action()
+            if not self.winner:
+                # reveal 1 card
 
-            # reveal 1 card
+                # third round ask for action
+                self.ask_all_players_for_action()
+            if not self.winner:
+                # reveal 1 card
 
-            # fourth round ask for action
-            for player in self.current_players:
-                player.ask_for_action()
-
+                # fourth round ask for action
+                self.ask_all_players_for_action()
+            if not self.winner:
+                pass  # find the winner
             # announce winner, give him money in pot
 
             # reset pot, choose new button

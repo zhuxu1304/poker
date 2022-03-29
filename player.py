@@ -37,26 +37,22 @@ class Player(Socket_function):
         self.money += amount
         self.send('0'+str(self.get_money))
 
-    def ask_for_action(self):
+    def ask_for_action(self,bet):
         self.send('4')
-        action = self.get()
+        action = json.loads(self.get())
         if action == 'fold':
-            pass
+            return (False)
         elif action == 'raise':
             pass
         elif action == 'call':
             pass
         elif action == 'check':
             pass
-        elif action == 'bet':
-            pass
 
-    def ask_for_action_firstround(self):
-        self.send('3')
-        action = self.get()
-        if action == 'fold':
-            pass
-        elif action == 'raise':
-            pass
-        elif action == 'call':
-            pass
+
+    def ask_for_action_firstround(self,bet): # get a list object via json,return a list object [operation,value]
+        self.send('3'+str(bet))
+        action = json.loads(self.get())
+        if action[0] != 'fold':
+            self.change_money(-action[1])
+        return action
