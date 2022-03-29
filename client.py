@@ -3,7 +3,8 @@ import time
 from socket_functions import Socket_function
 import json
 
-class User(Socket_function,Rules):
+
+class User(Socket_function, Rules):
     def __init__(self):  # create socket with welcome port and then a random port
         s = socket.socket()
         s.connect(('127.0.0.1', 5005))
@@ -16,35 +17,57 @@ class User(Socket_function,Rules):
         self.name = input()
         self.sendeStr(self.komm_s, self.name)  # send username
         print("waiting for other players")  # waiting for other players
-        #set money,community cards, player cards
+        # set money,community cards, player cards
         self.money = 1000
-        self.community_cards=[]
-        self.cards = [] 
+        self.community_cards = []
+        self.cards = []
+        self.ingame = False
         self.run()
-        
+
     def run(self):
-        # waiting for signal to start
+
         while True:
-            if self.empfangeStr(self.komm_s) == 'start':
+            if self.empfangeStr(self.komm_s) == 'start':  # waiting for signal to start
+                self.ingame = True
                 break
             time.sleep(0.1)
-        
-        # waiting for instruction
-        while True:
-            instruction = self.empfangeStr(self.komm_s)
-            if instruction[0] = '0': # change local money
-                self.money = int(instruction[1:])
-                self.update()
-            elif instruction[0] == '1': # set commnunity cards
-                self.community_cards = json.loads(instruction[1:])
-                self.update()
-            elif instruction[0] == '2': # set player cards
-                self.cards = json.loads(instruction[1:])
-                self.update()
-            elif instruction[0] == '3': # ask for action first round
-                
-            
+
+            # waiting for instruction
+            while self.ingame:
+                instruction = self.empfangeStr(self.komm_s)
+                if instruction[0] == '0':  # change local money
+                    self.money = int(instruction[1:])
+                    self.update()
+                elif instruction[0] == '1':  # set commnunity cards
+                    self.community_cards = json.loads(instruction[1:])
+                    self.update()
+                elif instruction[0] == '2':  # set player cards
+                    self.cards = json.loads(instruction[1:])
+                    self.update()
+                elif instruction[0] == '3':  # ask for action first round
+                    bet = int(instruction[1:])
+                    print('current bet is:', bet)
+                    action = input('enter your choice:')
+                    if not action:  # [fold,'']
+                        self.ingame = False
+                        self.sendeStr(json.dumps(action))
+                    else:  # call or raise, depends on user ['call',bet] or ['raise', value]
+                        self.sendeStr(json.dumps(action))
+                elif instruction[0] == '4': # ask for action
+                    bet = int(instruction[1:])
+                    print('current bet is:', bet)
+                    action = input('enter your choice:')
+                    if not action:  # [fold,'']
+                        self.ingame = False
+                        self.sendeStr(json.dumps(action))
+                    else:  # call, check or raise, depends on user ['call',bet] or ['raise', value] or ['check',0]
+                        self.sendeStr(json.dumps(action))
+                elif instruction[0] == '5': # reveal 3 cards
+                    print(self.community_cards[:2])
+
+
     def update(self):
         pass
+
 
 user = User()
