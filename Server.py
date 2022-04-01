@@ -26,7 +26,7 @@ class Server(Socket_function):
 
     def run(self):
         # welcome server
-        while len(self.game.players) < 2:
+        while len(self.game.players) < 5:
             komm_s, adress = self.welcome_socket.accept()
             print(1)
             with socketserver.TCPServer(("localhost", 0), None) as s:
@@ -38,6 +38,6 @@ class Server(Socket_function):
         # start game
         self.game.run()
 
-
-server = Server()
-server.run()
+if __name__ == '__main__':
+    server = Server()
+    server.run()

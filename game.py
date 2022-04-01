@@ -93,12 +93,12 @@ class Game(Rules):
 
             # deliever community cards+
             self.cards, self.community_cards = self.get_random_deck(self.cards, 5)
-            self.self.send_to_all_player('1' + json.dumps(self.community_cards))
+            self.send_to_all_player('b' + json.dumps(self.community_cards))
 
             # give each player two cards+
             for player in self.players:
                 self.cards, cards = self.get_random_deck(self.cards, 2)
-                player.set_card(cards)
+                player.set_cards(cards)
 
             # set first player and first round ask for action+
             self.winner = None
@@ -125,25 +125,45 @@ class Game(Rules):
             if not self.winner:
                 # reveal 3 cards+
                 print(self.community_cards[:2])
-                self.send_to_all_player('5')
+                self.send_to_all_player('f')
 
                 # second round ask for action+
                 self.ask_all_players_for_action()
 
             if not self.winner:
-                # reveal 1 card
-
-                # third round ask for action
+                # reveal 1 card+
+                print(self.community_cards[3])
+                self.send_to_all_player('g')
+                # third round ask for action+
                 self.ask_all_players_for_action()
             if not self.winner:
-                # reveal 1 card
-
-                # fourth round ask for action
+                # reveal 1 card+
+                print(self.community_cards[4])
+                self.send_to_all_player('h')
+                # fourth round ask for action+
                 self.ask_all_players_for_action()
             if not self.winner:
-                pass  # find the winner
+                biggest = 0
+                winner = []
+                for player in self.current_players:  # find the winner
+                    analyse = self.get_highest_combi(player.cards,self.community_cards)
+                    points = analyse[2] + analyse[1][0][1]/100
+                    if points >= biggest:
+                        biggest = points
+                        if len(winner) > 0: # if someone in list winner
+                            if winner[0][1] == points:# if same points
+                                winner.append((player, points))
+                            else:# if this player has higher points than the player in the list winner
+                                winner = []
+                                winner.append((player, points))
+                        else:# if there is no one in the list winner
+                            winner.append((player, points))
+            else:
+                winner = [(self.winner,0)]
+                    
             # announce winner, give him money in pot
-
+            for player in winner:
+                player[0].change_money(pot//len(winner))
             # reset pot, choose new button
             self.pot = 0
             self.button += 1
