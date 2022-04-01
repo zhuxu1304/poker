@@ -1,5 +1,6 @@
 from random import choice
 
+
 class Rules():
     def get_random_deck(self, cards, size):
         random_deck = []
@@ -179,47 +180,74 @@ class Rules():
 
     def get_highest_combi(self, player_deck, table_deck):
         random_deck = player_deck + table_deck
-##        print()
-##        print("Zufälliges Karten:", random_deck)
-##        print("Karten sortiert anhand ihrem Wert:", sort_cards(random_deck))
+        ##        print()
+        ##        print("Zufälliges Karten:", random_deck)
+        ##        print("Karten sortiert anhand ihrem Wert:", sort_cards(random_deck))
 
         if self.check_for_royal_flush(random_deck):
-            return("Royal Flush", random_deck[:5],10)
+            res = random_deck[:5]
+            return ("Royal Flush", res, 10 + res[0][1] / 100)
             ## print("Your highest combination is a Royal Flush:", random_deck[:5])
 
         elif self.check_for_straight_flush(random_deck)[0]:
-            return("Straight Flush", self.check_for_straight_flush(random_deck)[1],9)
+            res = self.check_for_straight_flush(random_deck)[1]
+            return ("Straight Flush", res, 9 + res[0][1] / 100)
             ## print("Your highest combination is a Straight Flush:", check_for_straight_flush(random_deck)[1])
 
         elif self.check_for_four_of_a_kind(random_deck)[0]:
-            return ('Four of a Kind',self.check_for_four_of_a_kind(random_deck)[1],8)
+            res = self.check_for_four_of_a_kind(random_deck)[1]
+            return ('Four of a Kind', res, 8 + res[0][1] / 100)
             ## print("Your highest combination is a Four of a Kind:", check_for_four_of_a_kind(random_deck)[1])
 
         elif self.check_for_fullhouse(random_deck)[0]:
-            return ('Fullhouse',self.check_for_fullhouse(random_deck)[1],7)
+            res = self.check_for_fullhouse(random_deck)[1]
+            return ('Fullhouse', res, 7 + res[0][1] / 100)
             ## print("Your highest combination is a Fullhouse:", check_for_fullhouse(random_deck)[1])
 
         elif self.check_for_flush(random_deck)[0]:
-            return ('Flush',self.check_for_flush(random_deck)[1],6)
+            res = self.check_for_flush(random_deck)[1]
+            return ('Flush', res, 6 + res[0][1] / 100)
             ## print("Your highest combination is a Flush:", check_for_flush(random_deck)[1])
 
         elif self.check_for_straight(random_deck)[0]:
-            return ('Straight',self.check_for_straight(random_deck)[1],5)
+            res = self.check_for_straight(random_deck)[1]
+            return ('Straight', res, 5 + res[0][1] / 100)
             ## print("Your highest combination is a Straight:", check_for_straight(random_deck)[1])
 
         elif self.check_for_three_of_a_kind(random_deck)[0]:
-            return ('Three of a Kind',self.check_for_three_of_a_kind(random_deck)[1],4)
+            res = self.check_for_three_of_a_kind(random_deck)[1]
+            return ('Three of a Kind', res, 4 + res[0][1] / 100)
             ## print("Your highest combination is a Three of a Kind:", check_for_three_of_a_kind(random_deck)[1])
 
         elif self.check_for_two_pair(random_deck)[0]:
-            return ('Two Pair',self.check_for_two_pair(random_deck)[1],3)
+            res = self.check_for_two_pair(random_deck)[1]
+            return ('Two Pair', res, 3 + res[0][1] / 100)
             ## print("Your highest combination is a Two Pair:", check_for_two_pair(random_deck)[1])
 
         elif self.check_for_one_pair(random_deck)[0]:
-            return ('One Pair',self.check_for_one_pair(random_deck)[1],2)
+            res = self.check_for_one_pair(random_deck)[1]
+            return ('One Pair', res, 2 + res[0][1] / 100)
             ## print("Your highest combination is a One Pair:", check_for_one_pair(random_deck)[1])
 
         else:
-            return ('High Card',self.check_for_highcard(random_deck),1)
+            res = self.check_for_highcard(random_deck)
+            return ('High Card', res, 1 + res[1] / 100)
             ## print("Your highest card is:", check_for_highcard(random_deck))
 
+
+if __name__ == '__main__':
+    for i in range(10000):
+        r = Rules()
+        cards = [("Kreuz", 2), ("Kreuz", 3), ("Kreuz", 4), ("Kreuz", 5), ("Kreuz", 6), ("Kreuz", 7),
+                 ("Kreuz", 8), ("Kreuz", 9), ("Kreuz", 10), ("Kreuz", 11), ("Kreuz", 12), ("Kreuz", 13),
+                 ("Kreuz", 14),
+                 ("Karo", 2), ("Karo", 3), ("Karo", 4), ("Karo", 5), ("Karo", 6), ("Karo", 7), ("Karo", 8),
+                 ("Karo", 9), ("Karo", 10), ("Karo", 11), ("Karo", 12), ("Karo", 13), ("Karo", 14),
+                 ("Herz", 2), ("Herz", 3), ("Herz", 4), ("Herz", 5), ("Herz", 6), ("Herz", 7), ("Herz", 8),
+                 ("Herz", 9), ("Herz", 10), ("Herz", 11), ("Herz", 12), ("Herz", 13), ("Herz", 14),
+                 ("Piek", 2), ("Piek", 3), ("Piek", 4), ("Piek", 5), ("Piek", 6), ("Piek", 7), ("Piek", 8),
+                 ("Piek", 9), ("Piek", 10), ("Piek", 11), ("Piek", 12), ("Piek", 13), ("Piek", 14)]
+        random_deck = r.get_random_deck(cards, 7)[1]
+        print("Zufälliges Karten:", random_deck)
+        print("Karten sortiert anhand ihrem Wert:", r.sort_cards(random_deck))
+        print(r.get_highest_combi(random_deck, []))
