@@ -39,6 +39,7 @@ class Player(Socket_function):
     def change_money(self, amount):
         self.money += amount
         self.send('a' + str(self.get_money()))
+        print('money changed')
 
     def ask_for_action(self, bet):
         self.send('e' + str(bet))

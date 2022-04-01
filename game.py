@@ -44,14 +44,14 @@ class Game(Rules):
         while True:
             if self.players[pos] in self.current_players:
                 small_blind = self.players[pos]
-                for i in range(len(self.current_players)):
-                    if self.current_players[i] == small_blind:
-                        end = i
                 break
             else:
                 pos = self.get_next_player(pos)
 
         self.current_bet = 50
+        self.current_player = self.current_players.index(small_blind)
+        end = self.current_player-1
+        flag = False
         while self.current_player != end or len(self.current_players) == 1:
             action = self.current_players[self.current_player].ask_for_action(self.current_bet)
             if action[0] == 'fold':
@@ -69,6 +69,10 @@ class Game(Rules):
                 pass
 
             self.set_next_player()
+            if not flag:
+
+                end = self.current_players.index(small_blind)
+                flag = True
         if len(self.current_players) == 1:
             self.winner = self.current_players[0]
 
@@ -111,10 +115,12 @@ class Game(Rules):
             self.current_bet = 50
             while self.current_player != end or len(self.current_players) == 1:
                 action = self.current_players[self.current_player].ask_for_action_firstround(self.current_bet)
+                print(action,action[0])
                 if action[0] == 'fold':
                     del self.current_players[self.current_player]
                     self.current_player -= 1
                 elif action[0] == 'call':
+                    print('enter call')
                     self.pot += self.current_bet
                     self.current_players[self.current_player].change_money(-self.current_bet)
                 elif action[0] == 'raise':
@@ -126,14 +132,16 @@ class Game(Rules):
                 self.set_next_player()
             if len(self.current_players) == 1:
                 self.winner = self.current_players[0]
+            print('1. round done')
 
             if not self.winner:
                 # reveal 3 cards+
-                print(self.community_cards[:2])
+                print(self.community_cards[:3])
                 self.send_to_all_player('f')
 
                 # second round ask for action+
                 self.ask_all_players_for_action()
+            print('2. round done')
 
             if not self.winner:
                 # reveal 1 card+
@@ -141,25 +149,30 @@ class Game(Rules):
                 self.send_to_all_player('g')
                 # third round ask for action+
                 self.ask_all_players_for_action()
+            print('3. round done')
             if not self.winner:
                 # reveal 1 card+
                 print(self.community_cards[4])
                 self.send_to_all_player('h')
                 # fourth round ask for action+
                 self.ask_all_players_for_action()
+            print('4. round done')
             if not self.winner:
-                result = []
+                winner = []
                 for player in self.current_players:
-                    result.append(self.get_highest_combi(player.cards, self.community_cards))
-                winner = resultsort(key=lambda x: x[2], reverse=True)
-                max_score = winner[0][2]
+                    winner.append((player,self.get_highest_combi(player.cards, self.community_cards)))
+                print(winner)
+                winner.sort(key=lambda x: x[1][2], reverse=True)
+                print(winner)
+                max_score = winner[0][1][2]
                 for each in winner:
-                    if each[0][2] < max_score:
+                    if each[1][2] < max_score:
                         winner.remove(each)
             else:
                 winner = [(self.winner, 0)]
             print('winner found')
             # announce winner, give him money in pot
+            print('pot:',self.pot)
             for player in winner:
                 player[0].change_money(self.pot // len(winner))
             # reset pot, choose new button
