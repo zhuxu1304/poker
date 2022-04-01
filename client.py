@@ -52,6 +52,8 @@ class User(Socket_function, Rules):
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
                     action = input('enter your choice:')
+                    action = [action,bet]
+                    print(action)
                     if action[0]== 'fold':  # [fold,'']
                         self.ingame = False
                         self.sendeStr(self.komm_s,json.dumps(action))

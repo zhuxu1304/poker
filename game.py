@@ -165,9 +165,13 @@ class Game(Rules):
                 winner.sort(key=lambda x: x[1][2], reverse=True)
                 print(winner)
                 max_score = winner[0][1][2]
+                print(max_score)
+                zw = []
                 for each in winner:
-                    if each[1][2] < max_score:
-                        winner.remove(each)
+                    if each[1][2] == max_score:
+                        zw.append(each)
+                winner = zw
+                print(winner)
             else:
                 winner = [(self.winner, 0)]
             print('winner found')
