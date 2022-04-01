@@ -77,10 +77,10 @@ class Rules():
     def check_for_two_pair(self, random_deck):
         is_two_pair = False
         found = []
-        if len(check_for_one_pair(random_deck)[1]) >= 4:
+        if len(self.check_for_one_pair(random_deck)[1]) >= 4:
             is_two_pair = True
-            found = check_for_one_pair(random_deck)[1]
-            sort_cards(found)
+            found = self.check_for_one_pair(random_deck)[1]
+            self.sort_cards(found)
         return is_two_pair, found[:4]
 
     # Check for one Pair
@@ -119,17 +119,17 @@ class Rules():
         found = []
         if random_deck[0][1] == random_deck[1][1] + 1 and random_deck[1][1] == random_deck[2][1] + 1 and random_deck[2][
             1] == random_deck[3][1] + 1 and random_deck[3][1] == random_deck[4][1] + 1 and \
-                check_for_flush(random_deck[:5])[0]:
+                self.check_for_flush(random_deck[:5])[0]:
             is_straight_flush = True
             found = random_deck[:5]
         elif random_deck[1][1] == random_deck[2][1] + 1 and random_deck[2][1] == random_deck[3][1] + 1 and \
                 random_deck[3][1] == random_deck[4][1] + 1 and random_deck[4][1] == random_deck[5][1] + 1 and \
-                check_for_flush(random_deck[1:6])[0]:
+                self.check_for_flush(random_deck[1:6])[0]:
             is_straight_flush = True
             found = random_deck[1:6]
         elif random_deck[2][1] == random_deck[3][1] + 1 and random_deck[3][1] == random_deck[4][1] + 1 and \
                 random_deck[4][1] == random_deck[5][1] + 1 and random_deck[5][1] == random_deck[6][1] + 1 and \
-                check_for_flush(random_deck[2:7])[0]:
+                self.check_for_flush(random_deck[2:7])[0]:
             is_straight_flush = True
             found = random_deck[2:7]
         else:
@@ -141,17 +141,17 @@ class Rules():
 
     def check_for_fullhouse(self, random_deck):
         is_fullhouse = False
-        three_of_a_kind = check_for_three_of_a_kind(random_deck)
+        three_of_a_kind = self.check_for_three_of_a_kind(random_deck)
         one_pair = []
         if three_of_a_kind[0]:
             for triple in three_of_a_kind[1]:
                 random_deck.remove(triple)
-            if check_for_one_pair(random_deck)[0]:
-                one_pair = check_for_one_pair(random_deck)[1][:2]
+            if self.check_for_one_pair(random_deck)[0]:
+                one_pair = self.check_for_one_pair(random_deck)[1][:2]
                 is_fullhouse = True
             for triple in three_of_a_kind[1]:
                 random_deck.append(triple)
-                sort_cards(random_deck)
+                self.sort_cards(random_deck)
             for double in one_pair:
                 three_of_a_kind[1].append(double)
                 # sort_cards(three_of_a_kind[1])
@@ -183,43 +183,43 @@ class Rules():
 ##        print("Zufälliges Karten:", random_deck)
 ##        print("Karten sortiert anhand ihrem Wert:", sort_cards(random_deck))
 
-        if check_for_royal_flush(random_deck):
+        if self.check_for_royal_flush(random_deck):
             return("Royal Flush", random_deck[:5],10)
             ## print("Your highest combination is a Royal Flush:", random_deck[:5])
 
-        elif check_for_straight_flush(random_deck)[0]:
-            return("Straight Flush", check_for_straight_flush(random_deck)[1],9)
+        elif self.check_for_straight_flush(random_deck)[0]:
+            return("Straight Flush", self.check_for_straight_flush(random_deck)[1],9)
             ## print("Your highest combination is a Straight Flush:", check_for_straight_flush(random_deck)[1])
 
-        elif check_for_four_of_a_kind(random_deck)[0]:
-            return ('Four of a Kind',check_for_four_of_a_kind(random_deck)[1],8)
+        elif self.check_for_four_of_a_kind(random_deck)[0]:
+            return ('Four of a Kind',self.check_for_four_of_a_kind(random_deck)[1],8)
             ## print("Your highest combination is a Four of a Kind:", check_for_four_of_a_kind(random_deck)[1])
 
-        elif check_for_fullhouse(random_deck)[0]:
-            return ('Fullhouse',check_for_fullhouse(random_deck)[1],7)
+        elif self.check_for_fullhouse(random_deck)[0]:
+            return ('Fullhouse',self.check_for_fullhouse(random_deck)[1],7)
             ## print("Your highest combination is a Fullhouse:", check_for_fullhouse(random_deck)[1])
 
-        elif check_for_flush(random_deck)[0]:
-            return ('Flush',check_for_flush(random_deck)[1],6)
+        elif self.check_for_flush(random_deck)[0]:
+            return ('Flush',self.check_for_flush(random_deck)[1],6)
             ## print("Your highest combination is a Flush:", check_for_flush(random_deck)[1])
 
-        elif check_for_straight(random_deck)[0]:
-            return ('Straight',check_for_straight(random_deck)[1],5)
+        elif self.check_for_straight(random_deck)[0]:
+            return ('Straight',self.check_for_straight(random_deck)[1],5)
             ## print("Your highest combination is a Straight:", check_for_straight(random_deck)[1])
 
-        elif check_for_three_of_a_kind(random_deck)[0]:
-            return ('Three of a Kind',check_for_three_of_a_kind(random_deck)[1],4)
+        elif self.check_for_three_of_a_kind(random_deck)[0]:
+            return ('Three of a Kind',self.check_for_three_of_a_kind(random_deck)[1],4)
             ## print("Your highest combination is a Three of a Kind:", check_for_three_of_a_kind(random_deck)[1])
 
-        elif check_for_two_pair(random_deck)[0]:
-            return ('Two Pair',check_for_two_pair(random_deck)[1],3)
+        elif self.check_for_two_pair(random_deck)[0]:
+            return ('Two Pair',self.check_for_two_pair(random_deck)[1],3)
             ## print("Your highest combination is a Two Pair:", check_for_two_pair(random_deck)[1])
 
-        elif check_for_one_pair(random_deck)[0]:
-            return ('One Pair',check_for_one_pair(random_deck)[1],2)
+        elif self.check_for_one_pair(random_deck)[0]:
+            return ('One Pair',self.check_for_one_pair(random_deck)[1],2)
             ## print("Your highest combination is a One Pair:", check_for_one_pair(random_deck)[1])
 
         else:
-            return ('High Card',check_for_highcard(random_deck),1)
+            return ('High Card',self.check_for_highcard(random_deck),1)
             ## print("Your highest card is:", check_for_highcard(random_deck))
 

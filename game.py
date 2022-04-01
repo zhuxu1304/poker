@@ -44,14 +44,12 @@ class Game(Rules):
         while True:
             if self.players[pos] in self.current_players:
                 small_blind = self.players[pos]
-                for i in len(self.current_players):
+                for i in range(len(self.current_players)):
                     if self.current_players[i] == small_blind:
                         end = i
                 break
             else:
                 pos = self.get_next_player(pos)
-
-
 
         self.current_bet = 50
         while self.current_player != end or len(self.current_players) == 1:
@@ -61,9 +59,11 @@ class Game(Rules):
                 del self.current_players[self.current_player]
             elif action[0] == 'call':
                 self.pot += self.current_bet
+                self.current_players[self.current_player].change_money(-self.current_bet)
             elif action[0] == 'raise':
                 self.current_bet = action[1]
                 self.pot += self.current_bet
+                self.current_players[self.current_player].change_money(-self.current_bet)
                 end = self.current_player
             elif action[0] == 'check':
                 pass
@@ -87,6 +87,7 @@ class Game(Rules):
             self.pot += 25
             self.players[big_blind].change_money(-50)
             self.pot += 50
+            print('small and big blind done')
 
             # add player to current_player+
             self.current_players = self.players[:]
@@ -94,11 +95,13 @@ class Game(Rules):
             # deliever community cards+
             self.cards, self.community_cards = self.get_random_deck(self.cards, 5)
             self.send_to_all_player('b' + json.dumps(self.community_cards))
+            print('cummunity cards send')
 
             # give each player two cards+
             for player in self.players:
                 self.cards, cards = self.get_random_deck(self.cards, 2)
                 player.set_cards(cards)
+            print('player cards send')
 
             # set first player and first round ask for action+
             self.winner = None
@@ -113,9 +116,11 @@ class Game(Rules):
                     self.current_player -= 1
                 elif action[0] == 'call':
                     self.pot += self.current_bet
+                    self.current_players[self.current_player].change_money(-self.current_bet)
                 elif action[0] == 'raise':
                     self.current_bet = action[1]
                     self.pot += self.current_bet
+                    self.current_players[self.current_player].change_money(-self.current_bet)
                     end = self.current_player
 
                 self.set_next_player()
@@ -143,27 +148,20 @@ class Game(Rules):
                 # fourth round ask for action+
                 self.ask_all_players_for_action()
             if not self.winner:
-                biggest = 0
-                winner = []
-                for player in self.current_players:  # find the winner
-                    analyse = self.get_highest_combi(player.cards,self.community_cards)
-                    points = analyse[2] + analyse[1][0][1]/100
-                    if points >= biggest:
-                        biggest = points
-                        if len(winner) > 0: # if someone in list winner
-                            if winner[0][1] == points:# if same points
-                                winner.append((player, points))
-                            else:# if this player has higher points than the player in the list winner
-                                winner = []
-                                winner.append((player, points))
-                        else:# if there is no one in the list winner
-                            winner.append((player, points))
+                result = []
+                for player in self.current_players:
+                    result.append(self.get_highest_combi(player.cards, self.community_cards))
+                winner = resultsort(key=lambda x: x[2], reverse=True)
+                max_score = winner[0][2]
+                for each in winner:
+                    if each[0][2] < max_score:
+                        winner.remove(each)
             else:
-                winner = [(self.winner,0)]
-                    
+                winner = [(self.winner, 0)]
+            print('winner found')
             # announce winner, give him money in pot
             for player in winner:
-                player[0].change_money(pot//len(winner))
+                player[0].change_money(self.pot // len(winner))
             # reset pot, choose new button
             self.pot = 0
             self.button += 1
