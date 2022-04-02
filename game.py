@@ -5,14 +5,23 @@ from socket_functions import Socket_function
 
 
 class Game(Rules):
-    def __init__(self, cards):
+    def __init__(self):
         self.players = []
         self.current_players = []
         self.current_player = 0
         self.round = 1
         self.button = 0
         self.pot = 0
-        self.cards = cards
+        self.cards = [("Kreuz", 2), ("Kreuz", 3), ("Kreuz", 4), ("Kreuz", 5), ("Kreuz", 6), ("Kreuz", 7),
+                      ("Kreuz", 8), ("Kreuz", 9), ("Kreuz", 10), ("Kreuz", 11), ("Kreuz", 12), ("Kreuz", 13),
+                      ("Kreuz", 14),
+                      ("Karo", 2), ("Karo", 3), ("Karo", 4), ("Karo", 5), ("Karo", 6), ("Karo", 7), ("Karo", 8),
+                      ("Karo", 9), ("Karo", 10), ("Karo", 11), ("Karo", 12), ("Karo", 13), ("Karo", 14),
+                      ("Herz", 2), ("Herz", 3), ("Herz", 4), ("Herz", 5), ("Herz", 6), ("Herz", 7), ("Herz", 8),
+                      ("Herz", 9), ("Herz", 10), ("Herz", 11), ("Herz", 12), ("Herz", 13), ("Herz", 14),
+                      ("Piek", 2), ("Piek", 3), ("Piek", 4), ("Piek", 5), ("Piek", 6), ("Piek", 7), ("Piek", 8),
+                      ("Piek", 9), ("Piek", 10), ("Piek", 11), ("Piek", 12), ("Piek", 13), ("Piek", 14)]
+        self.backup_cards = self.cards[:]
         self.current_bet = 0
         self.community_cards = []
 
@@ -50,13 +59,17 @@ class Game(Rules):
 
         self.current_bet = 50
         self.current_player = self.current_players.index(small_blind)
-        end = self.current_player-1
+        end = self.current_player - 1
         flag = False
-        while self.current_player != end or len(self.current_players) == 1:
+        while self.current_player != end and len(self.current_players) != 1:
+            if not flag:
+                end = self.current_players.index(small_blind)
+                flag = True
             action = self.current_players[self.current_player].ask_for_action(self.current_bet)
             if action[0] == 'fold':
-                self.current_player -= 1
                 del self.current_players[self.current_player]
+                self.current_player -= 1
+
             elif action[0] == 'call':
                 self.pot += self.current_bet
                 self.current_players[self.current_player].change_money(-self.current_bet)
@@ -69,18 +82,15 @@ class Game(Rules):
                 pass
 
             self.set_next_player()
-            if not flag:
 
-                end = self.current_players.index(small_blind)
-                flag = True
         if len(self.current_players) == 1:
             self.winner = self.current_players[0]
 
     def run(self):
-        # tell each player to start
-        self.send_to_all_player('start')
 
         while True:
+            # tell each player to start
+            self.send_to_all_player('start')
             # set button, small and big blind+
             button = self.players[self.button]
             small_blind = self.get_next_player(self.button)
@@ -113,9 +123,9 @@ class Game(Rules):
             self.set_next_player()
             end = big_blind
             self.current_bet = 50
-            while self.current_player != end or len(self.current_players) == 1:
+            while self.current_player != end and len(self.current_players) != 1:
                 action = self.current_players[self.current_player].ask_for_action_firstround(self.current_bet)
-                print(action,action[0])
+                print(action, action[0])
                 if action[0] == 'fold':
                     del self.current_players[self.current_player]
                     self.current_player -= 1
@@ -130,6 +140,7 @@ class Game(Rules):
                     end = self.current_player
 
                 self.set_next_player()
+                print('current player', self.current_player, 'end', end)
             if len(self.current_players) == 1:
                 self.winner = self.current_players[0]
             print('1. round done')
@@ -160,7 +171,7 @@ class Game(Rules):
             if not self.winner:
                 winner = []
                 for player in self.current_players:
-                    winner.append((player,self.get_highest_combi(player.cards, self.community_cards)))
+                    winner.append((player, self.get_highest_combi(player.cards, self.community_cards)))
                 print(winner)
                 winner.sort(key=lambda x: x[1][2], reverse=True)
                 print(winner)
@@ -176,9 +187,10 @@ class Game(Rules):
                 winner = [(self.winner, 0)]
             print('winner found')
             # announce winner, give him money in pot
-            print('pot:',self.pot)
+            print('pot:', self.pot)
             for player in winner:
                 player[0].change_money(self.pot // len(winner))
             # reset pot, choose new button
             self.pot = 0
             self.button += 1
+            self.cards = self.backup_cards[:]

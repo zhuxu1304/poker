@@ -23,6 +23,7 @@ class User(Socket_function, Rules):
         self.community_cards = []
         self.cards = []
         self.ingame = False
+        self.revealed_cards = []
         self.run()
 
     def run(self):
@@ -52,7 +53,7 @@ class User(Socket_function, Rules):
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
                     action = input('enter your choice:')
-                    action = [action,bet]
+                    action = [action,bet+10]
                     print(action)
                     if action[0]== 'fold':  # [fold,'']
                         self.ingame = False
@@ -63,7 +64,7 @@ class User(Socket_function, Rules):
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
                     action = input('enter your choice:')# if bet = 0: check, rasie or fold # if bet != 0: call, rasie or fold
-                    action = [action,bet]
+                    action = [action,bet+10]
                     print(action)
                     if action[0]== 'fold':  # [fold,'']
                         self.ingame = False
@@ -72,10 +73,16 @@ class User(Socket_function, Rules):
                         self.sendeStr(self.komm_s,json.dumps(action))
                 elif instruction[0] == 'f': # reveal 3 cards
                     print(self.community_cards[:3])
+                    self.revealed_cards.append(self.community_cards[:3])
+                    #print(self.get_highest_combi(self.revealed_cards,self.cards))
                 elif instruction[0] == 'g': # reveal 4. card
                     print(self.community_cards[3])
+                    self.revealed_cards.append(self.community_cards[3])
+                    #print(self.get_highest_combi(self.revealed_cards, self.cards))
                 elif instruction[0] == 'h': # reveal 5. card
                     print(self.community_cards[4])
+                    self.revealed_cards.append(self.community_cards[4])
+                    #print(self.get_highest_combi(self.revealed_cards, self.cards))
 
 
     def update(self):
