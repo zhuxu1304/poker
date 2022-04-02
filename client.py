@@ -52,7 +52,7 @@ class User(Socket_function, Rules):
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
                     action = input('enter your choice:')
-                    action = [action,bet]
+                    action = [action,bet+10]
                     print(action)
                     if action[0]== 'fold':  # [fold,'']
                         self.ingame = False
@@ -63,7 +63,7 @@ class User(Socket_function, Rules):
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
                     action = input('enter your choice:')# if bet = 0: check, rasie or fold # if bet != 0: call, rasie or fold
-                    action = [action,bet]
+                    action = [action,bet+10]
                     print(action)
                     if action[0]== 'fold':  # [fold,'']
                         self.ingame = False
