@@ -74,15 +74,15 @@ class User(Socket_function, Rules):
                 elif instruction[0] == 'f': # reveal 3 cards
                     print(self.community_cards[:3])
                     self.revealed_cards.append(self.community_cards[:3])
-                    print(self.get_highest_combi(self.revealed_cards,self.cards))
+                    #print(self.get_highest_combi(self.revealed_cards,self.cards))
                 elif instruction[0] == 'g': # reveal 4. card
                     print(self.community_cards[3])
                     self.revealed_cards.append(self.community_cards[3])
-                    print(self.get_highest_combi(self.revealed_cards, self.cards))
+                    #print(self.get_highest_combi(self.revealed_cards, self.cards))
                 elif instruction[0] == 'h': # reveal 5. card
                     print(self.community_cards[4])
                     self.revealed_cards.append(self.community_cards[4])
-                    print(self.get_highest_combi(self.revealed_cards, self.cards))
+                    #print(self.get_highest_combi(self.revealed_cards, self.cards))
 
 
     def update(self):
