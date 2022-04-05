@@ -1,7 +1,6 @@
 from socket_functions import Socket_function
 import socket
 import json
-import time
 
 
 class Player(Socket_function):
@@ -43,12 +42,12 @@ class Player(Socket_function):
 
     def ask_for_action(self, bet):
         self.send('e' + str(bet))
-        #time.sleep(5)
+        # time.sleep(5)
         action = json.loads(self.get())
         return action
 
     def ask_for_action_firstround(self, bet):  # get a list object via json,return a list object [operation,value]
         self.send('d' + str(bet))
-        #time.sleep(5)
+        # time.sleep(5)
         action = json.loads(self.get())
         return action

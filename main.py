@@ -1,5 +1,3 @@
-from server import Server
+from pokergui import Poker_Gui
 
-serv = Server()
-serv.run()
-
+gui = Poker_Gui()

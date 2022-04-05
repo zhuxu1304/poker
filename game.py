@@ -24,6 +24,14 @@ class Game(Rules):
         self.backup_cards = self.cards[:]
         self.current_bet = 0
         self.community_cards = []
+        self.name_list = []
+        
+        self.money_list= []
+        self.status_list = []
+        for p in self.players:
+            self.name_list.append(p.name)
+            self.money_list.append(p.money)
+            self.status_list.append('')
 
     def add_player(self, player):
         self.players.append(player)
@@ -57,7 +65,7 @@ class Game(Rules):
             else:
                 pos = self.get_next_player(pos)
 
-        self.current_bet = 50
+        self.current_bet = 0
         self.current_player = self.current_players.index(small_blind)
         end = self.current_player - 1
         flag = False
@@ -66,11 +74,7 @@ class Game(Rules):
                 end = self.current_players.index(small_blind)
                 flag = True
             action = self.current_players[self.current_player].ask_for_action(self.current_bet)
-            if action[0] == 'fold':
-                del self.current_players[self.current_player]
-                self.current_player -= 1
-
-            elif action[0] == 'call':
+            if action[0] == 'call':
                 self.pot += self.current_bet
                 self.current_players[self.current_player].change_money(-self.current_bet)
             elif action[0] == 'raise':
@@ -79,18 +83,35 @@ class Game(Rules):
                 self.current_players[self.current_player].change_money(-self.current_bet)
                 end = self.current_player
             elif action[0] == 'check':
-                pass
+                self.pot += self.current_bet
+                self.current_players[self.current_player].change_money(-self.current_bet)
+            else:#elif action[0] == 'fold':
+                del self.current_players[self.current_player]
+                self.current_player -= 1
 
             self.set_next_player()
 
         if len(self.current_players) == 1:
             self.winner = self.current_players[0]
 
+    def update(self):
+        #send each player the three lists [self.name_list,self.money_list,status_list]
+        self.send_to_all_player('i'+json.dumps([self.name_list,self.money_list,self.status_list,self.pot]))
+
     def run(self):
 
         while True:
+            # set name list, money list, status list
+            for player in self.players:
+                self.name_list.append(player.name)
+                self.money_list.append(player.money)
+                self.status_list.append('')
+                
             # tell each player to start
             self.send_to_all_player('start')
+            #send each player the three lists [self.name_list,self.money_list,status_list]
+            self.update()
+            
             # set button, small and big blind+
             button = self.players[self.button]
             small_blind = self.get_next_player(self.button)
@@ -123,21 +144,25 @@ class Game(Rules):
             self.set_next_player()
             end = big_blind
             self.current_bet = 50
+            flag1 = False
             while self.current_player != end and len(self.current_players) != 1:
                 action = self.current_players[self.current_player].ask_for_action_firstround(self.current_bet)
                 print(action, action[0])
-                if action[0] == 'fold':
-                    del self.current_players[self.current_player]
-                    self.current_player -= 1
-                elif action[0] == 'call':
-                    print('enter call')
+                if action[0] == 'call':
                     self.pot += self.current_bet
-                    self.current_players[self.current_player].change_money(-self.current_bet)
+                    if self.current_player == small_blind and not flag1:
+                        self.current_players[self.current_player].change_money(-(self.current_bet-25))
+                        flag1 = True
+                    else:
+                        self.current_players[self.current_player].change_money(-self.current_bet)
                 elif action[0] == 'raise':
                     self.current_bet = action[1]
                     self.pot += self.current_bet
                     self.current_players[self.current_player].change_money(-self.current_bet)
                     end = self.current_player
+                else:#elif action[0] == 'fold':
+                    del self.current_players[self.current_player]
+                    self.current_player -= 1
 
                 self.set_next_player()
                 print('current player', self.current_player, 'end', end)
@@ -188,9 +213,13 @@ class Game(Rules):
             print('winner found')
             # announce winner, give him money in pot
             print('pot:', self.pot)
+            winner_name = []
+            for w in winner:
+                winner_name.append(w.name)
+            self.send_to_all_player('j'+json.dumps(winner_name))
             for player in winner:
                 player[0].change_money(self.pot // len(winner))
             # reset pot, choose new button
             self.pot = 0
-            self.button += 1
+            self.button = self.get_next_player(self.button)
             self.cards = self.backup_cards[:]
