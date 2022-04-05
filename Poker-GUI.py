@@ -2,6 +2,7 @@ from tkinter import *
 import socket
 from PIL import Image,ImageTk
 from random_deck import *
+from time import sleep
 
 class Poker_Gui():
 
@@ -13,7 +14,10 @@ class Poker_Gui():
         self.money_labels = []
         self.name_labels = []
         self.status_labels = []
-        self.main_menu()
+        self.player_cards = []
+        self.table_cards = []
+        self.own_money = 0
+        self.open_game_window(6)
 
     def set_money(self,money_list):
         for i,label in enumerate(self.money_labels):
@@ -27,11 +31,32 @@ class Poker_Gui():
         for i,label in enumerate(self.status_labels):
             label['text'] = status_list[i]
 
-    def set_pot_money(self,pot_money=44):
+    def set_pot_money(self,pot_money):
         self.pot_money['text'] = "Pot Money: "+str(pot_money)+"$"
 
-    def set_own_money(self,own_money=55):
+    def set_own_money(self,own_money):
+        self.own_money = own_money
         self.Money_label['text'] = "Your current money:\n"+str(own_money)+"$"
+
+    def set_player_cards(self,card_list):
+        card_images_player = []
+        for card in card_list:
+            card_images_player.append(ImageTk.PhotoImage(Image.open("cards/"+str(card)+".png").resize((80,100), Image.ANTIALIAS)))
+
+        for i,element in enumerate(self.player_cards):
+            element.configure(image=card_images_player[i])
+            element.image = card_images_player[i]
+
+    def set_table_cards(self,card_list):
+        card_images_table = []
+        for card in card_list:
+            card_images_table.append(ImageTk.PhotoImage(Image.open("cards/"+str(card)+".png").resize((120,180), Image.ANTIALIAS)))
+
+        for i,element in enumerate(card_images_table):
+            self.table_cards[i].configure(image=element)
+            self.table_cards[i].image = element
+        
+
 
 
     def open_host_window(self):
@@ -165,27 +190,27 @@ class Poker_Gui():
         
         card_images = []
         for card in self.card_list_table:
-            card_images.append(ImageTk.PhotoImage(Image.open("cards/"+str(card)+".png").resize((120,180), Image.ANTIALIAS)))
+            card_images.append(ImageTk.PhotoImage(Image.open("cards/back.png").resize((120,180), Image.ANTIALIAS)))
         card_coords = [(340,320),(470,320),(600,320),(730,320),(860,320)]
         for i,card in enumerate(self.card_list_table):
             #card_image = ImageTk.PhotoImage(Image.open("cards/"+str(card)+".png").resize((120,180), Image.ANTIALIAS))
             card_label = Label(game_window, image=card_images[i],bg="white")
             card_label.place(x=card_coords[i][0],y=card_coords[i][1],anchor=CENTER)
+            self.table_cards.append(card_label)
 
         #Placing player cards
-        
         card_images_player = []
-        for card in self.card_list_player:
-            card_images_player.append(ImageTk.PhotoImage(Image.open("cards/"+str(card)+".png").resize((80,100), Image.ANTIALIAS)))
+        for card in range(0,2):
+            card_images_player.append(ImageTk.PhotoImage(Image.open("cards/back.png").resize((80,100), Image.ANTIALIAS)))
         card_coords_player = [(50,60),(140,60)]
 
         frame_cards = Frame(game_window,bg="#303030")
         frame_cards.place(x=300,y=520,width=190,height=120)
 
-        for i,card in enumerate(self.card_list_player):
+        for i in range(0,2):
             card_label = Label(frame_cards, image=card_images_player[i],bg="white")
             card_label.place(x=card_coords_player[i][0],y=card_coords_player[i][1],anchor=CENTER)
-
+            self.player_cards.append(card_label)
         
         # Button for Call, Raise, Check, Fold, Quit
         # Quit
@@ -193,7 +218,7 @@ class Poker_Gui():
         Quit_Button.place(relx=0.05,rely=0.95,anchor=CENTER,height=55)
 
         # Check/Call
-        Check_Button = Button(game_window,text="Check\nCall",font="Arial 15",command=self.set_own_money)
+        Check_Button = Button(game_window,text="Check\nCall",font="Arial 15")
         Check_Button.place(relx=0.95,rely=0.95,anchor=CENTER,width=100,height=55)
 
         # Money
@@ -228,13 +253,11 @@ class Poker_Gui():
         game_window.mainloop()
 
     # To DO
-    # renaming the cards
-    # Raise slider to select money to be raised
     # small blind, big blind, dealer Button
     # menu select start money automatic adapt small/big blind
     # winner of the round screen
-    # update function for player connected and money etc.
-    # Class
+    # (half done) update function for player connected and money etc.
+    # Class -> finish setter methodes
 
     def main_menu(self):
         welcome_window = Tk()
