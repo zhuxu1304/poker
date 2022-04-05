@@ -7,16 +7,18 @@ import time
 
 
 class Server(Socket_function):
-    def __init__(self):
+    def __init__(self, player_number):
+        print(1)
         self.welcome_socket = socket.socket()
         self.welcome_socket.bind(('', 5005))
         self.welcome_socket.listen(10)
-
+        self.player_number = player_number
         self.game = Game()
 
     def run(self):
         # welcome server
-        while len(self.game.players) < 5:
+        while len(self.game.players) < self.player_number:
+            time.sleep(1)
             komm_s, adress = self.welcome_socket.accept()
             print(1)
             with socketserver.TCPServer(("localhost", 0), None) as s:
@@ -28,6 +30,5 @@ class Server(Socket_function):
         # start game
         self.game.run()
 
-if __name__ == '__main__':
-    server = Server()
-    server.run()
+
+

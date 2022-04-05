@@ -6,14 +6,15 @@ from rules import Rules
 
 
 class User(Socket_function, Rules):
-    def __init__(self):  # create socket with welcome port and then a random port
+    def __init__(self, ip):  # create socket with welcome port and then a random port
+        print(3)
         s = socket.socket()
-        s.connect(('192.168.100.7', 5005))
+        s.connect((ip, 5005))
         port = int(self.empfangeStr(s))
-        print(port)
+        # print(port)
         time.sleep(0.1)
         self.komm_s = socket.socket()
-        self.komm_s.connect(('192.168.100.7', port))
+        self.komm_s.connect((ip, port))
         print(self.empfangeStr(self.komm_s))
         self.name = input()
         self.sendeStr(self.komm_s, self.name)  # send username
@@ -24,7 +25,7 @@ class User(Socket_function, Rules):
         self.cards = []
         self.ingame = False
         self.revealed_cards = []
-        self.run()
+
 
     def run(self):
 
@@ -39,7 +40,8 @@ class User(Socket_function, Rules):
                 instruction = self.empfangeStr(self.komm_s)
                 if instruction[0] == 'a':  # change local money
                     self.money = int(instruction[1:])
-                    print('money',self.money)
+                    print('money', self.money)
+                    self.gui.set_own_money(self.money)
                     self.update()
                 elif instruction[0] == 'b':  # set commnunity cards
                     self.community_cards = json.loads(instruction[1:])
@@ -48,45 +50,63 @@ class User(Socket_function, Rules):
                 elif instruction[0] == 'c':  # set player cards
                     self.cards = json.loads(instruction[1:])
                     print(self.cards)
+                    self.gui.set_player_cards(self.cards)
                     self.update()
                 elif instruction[0] == 'd':  # ask for action first round
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
                     action = input('enter your choice:')
-                    action = [action,bet+10]
+                    action = [action, bet + 10]
                     print(action)
-                    if action[0]== 'fold':  # [fold,'']
+                    if action[0] == 'fold':  # [fold,'']
                         self.ingame = False
-                        self.sendeStr(self.komm_s,json.dumps(action))
+                        self.sendeStr(self.komm_s, json.dumps(action))
                     else:  # call or raise, depends on user ['call',bet] or ['raise', value]
-                        self.sendeStr(self.komm_s,json.dumps(action))
-                elif instruction[0] == 'e': # ask for action
+                        self.sendeStr(self.komm_s, json.dumps(action))
+                    self.update()
+                elif instruction[0] == 'e':  # ask for action
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
-                    action = input('enter your choice:')# if bet = 0: check, rasie or fold # if bet != 0: call, rasie or fold
-                    action = [action,bet+10]
+                    action = input(
+                        'enter your choice:')  # if bet = 0: check, rasie or fold # if bet != 0: call, rasie or fold
+                    action = [action, bet + 10]
                     print(action)
-                    if action[0]== 'fold':  # [fold,'']
+                    if action[0] == 'fold':  # [fold,'']
                         self.ingame = False
-                        self.sendeStr(self.komm_s,json.dumps(action))
+                        self.sendeStr(self.komm_s, json.dumps(action))
                     else:  # call, check or raise, depends on user ['call',bet] or ['raise', value] or ['check',0]
-                        self.sendeStr(self.komm_s,json.dumps(action))
-                elif instruction[0] == 'f': # reveal 3 cards
+                        self.sendeStr(self.komm_s, json.dumps(action))
+                    self.update()
+                elif instruction[0] == 'f':  # reveal 3 cards
                     print(self.community_cards[:3])
                     self.revealed_cards.append(self.community_cards[:3])
-                    #print(self.get_highest_combi(self.revealed_cards,self.cards))
-                elif instruction[0] == 'g': # reveal 4. card
+                    # print(self.get_highest_combi(self.revealed_cards,self.cards))
+                    self.gui.set_table_cards(self.revealed_cards)
+                elif instruction[0] == 'g':  # reveal 4. card
                     print(self.community_cards[3])
                     self.revealed_cards.append(self.community_cards[3])
-                    #print(self.get_highest_combi(self.revealed_cards, self.cards))
-                elif instruction[0] == 'h': # reveal 5. card
+                    # print(self.get_highest_combi(self.revealed_cards, self.cards))
+                    self.gui.set_table_cards(self.revealed_cards)
+                elif instruction[0] == 'h':  # reveal 5. card
                     print(self.community_cards[4])
                     self.revealed_cards.append(self.community_cards[4])
-                    #print(self.get_highest_combi(self.revealed_cards, self.cards))
-
+                    # print(self.get_highest_combi(self.revealed_cards, self.cards))
+                    self.gui.set_table_cards(self.revealed_cards)
+                elif instruction[0] == 'i':  # update
+                    self.update()
+                elif instruction[0] == 'j':  # show winner
+                    winner_name = json.loads(instruction[1:])
+                    print(winner_name, 'win!')
 
     def update(self):
-        pass
+        instruction = self.empfangeStr(self.komm_s)
+        res = json.loads(instruction[1:])
+        name_list, money_list, status_list, pot = res[0], res[1], res[2], res[3]
+        self.gui.set_money(money_list)
+        self.gui.set_names(name_list)
+        self.gui.set_status(status_list)
+        self.gui.set_pot_money(pot)
 
 
-user = User()
+if __name__ == '__main__':
+    user = User('172.16.0.36')
