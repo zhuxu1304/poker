@@ -18,9 +18,10 @@ class Server(Socket_function):
     def run(self):
         # welcome server
         while len(self.game.players) < self.player_number:
-            time.sleep(1)
+            #time.sleep(1)
+            print('Server open')
             komm_s, adress = self.welcome_socket.accept()
-            print(1)
+            
             with socketserver.TCPServer(("localhost", 0), None) as s:
                 free_port = s.server_address[1]
             self.sendeStr(komm_s, str(free_port))
@@ -31,4 +32,6 @@ class Server(Socket_function):
         self.game.run()
 
 
-
+if __name__ == '__main__':
+    serv = Server(6)
+    serv.run()
