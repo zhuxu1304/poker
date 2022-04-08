@@ -8,17 +8,7 @@ from rules import Rules
 class User(Socket_function, Rules):
     def __init__(self, ip):  # create socket with welcome port and then a random port
         print(3)
-        s = socket.socket()
-        s.connect((ip, 5005))
-        port = int(self.empfangeStr(s))
-        # print(port)
-        time.sleep(0.1)
-        self.komm_s = socket.socket()
-        self.komm_s.connect((ip, port))
-        print(self.empfangeStr(self.komm_s))
-        self.name = input()
-        self.sendeStr(self.komm_s, self.name)  # send username
-        print("waiting for other players")  # waiting for other players
+        self.ip = ip
         # set money,community cards, player cards
         self.money = 1000
         self.community_cards = []
@@ -28,6 +18,22 @@ class User(Socket_function, Rules):
 
 
     def run(self):
+        
+        print('client open')
+        s = socket.socket()
+        s.connect((self.ip, 5005))
+        port = int(self.empfangeStr(s))
+        # print(port)
+        time.sleep(0.1)
+        try:
+            self.komm_s = socket.socket()
+            self.komm_s.connect((self.ip, port))
+        except:
+            print('client error')
+        print(self.empfangeStr(self.komm_s))
+        self.name = input()
+        self.sendeStr(self.komm_s, self.name)  # send username
+        print("waiting for other players")  # waiting for other players
 
         while True:
             if self.empfangeStr(self.komm_s) == 'start':  # waiting for signal to start
@@ -110,3 +116,4 @@ class User(Socket_function, Rules):
 
 if __name__ == '__main__':
     user = User('172.16.0.36')
+    user.run()
