@@ -5,7 +5,12 @@ import json
 
 class Player(Socket_function):
     def __init__(self, port):  # create socket, get username, wait till 5 players, set amount of money
+        self.money = 1000
+        self.cards = []
+        self.bind(port)
 
+
+    def bind(self,port):
         self.s = socket.socket()
         self.s.bind((socket.gethostname(), port))
         self.port = port
@@ -15,8 +20,6 @@ class Player(Socket_function):
         self.name = self.empfangeStr(self.komm_s)
         # self.sendeStr(self.komm_s, "waiting for other players")
 
-        self.money = 1000
-        self.cards = []
         print(self.name)
 
     def set_cards(self, cards):
