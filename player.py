@@ -9,8 +9,7 @@ class Player(Socket_function):
         self.cards = []
         self.bind(port)
 
-
-    def bind(self,port):
+    def bind(self, port):
         self.s = socket.socket()
         self.s.bind((socket.gethostname(), port))
         self.port = port
