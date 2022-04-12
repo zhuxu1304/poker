@@ -16,9 +16,8 @@ class User(Socket_function, Rules):
         self.ingame = False
         self.revealed_cards = []
 
-
     def run(self):
-        
+
         print('client open')
         s = socket.socket()
         s.connect((self.ip, 5005))
@@ -47,17 +46,17 @@ class User(Socket_function, Rules):
                 if instruction[0] == 'a':  # change local money
                     self.money = int(instruction[1:])
                     print('money', self.money)
-                    self.gui.set_own_money(self.money)
-                    self.update()
+                    # self.gui.set_own_money(self.money)
+                    # self.update()
                 elif instruction[0] == 'b':  # set commnunity cards
                     self.community_cards = json.loads(instruction[1:])
                     print(self.community_cards)
-                    self.update()
+                    # self.update()
                 elif instruction[0] == 'c':  # set player cards
                     self.cards = json.loads(instruction[1:])
                     print(self.cards)
-                    self.gui.set_player_cards(self.cards)
-                    self.update()
+                    # self.gui.set_player_cards(self.cards)
+                    # self.update()
                 elif instruction[0] == 'd':  # ask for action first round
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
@@ -69,7 +68,7 @@ class User(Socket_function, Rules):
                         self.sendeStr(self.komm_s, json.dumps(action))
                     else:  # call or raise, depends on user ['call',bet] or ['raise', value]
                         self.sendeStr(self.komm_s, json.dumps(action))
-                    self.update()
+                    # self.update()
                 elif instruction[0] == 'e':  # ask for action
                     bet = int(instruction[1:])
                     print('current bet is:', bet)
@@ -82,24 +81,25 @@ class User(Socket_function, Rules):
                         self.sendeStr(self.komm_s, json.dumps(action))
                     else:  # call, check or raise, depends on user ['call',bet] or ['raise', value] or ['check',0]
                         self.sendeStr(self.komm_s, json.dumps(action))
-                    self.update()
+                    # self.update()
                 elif instruction[0] == 'f':  # reveal 3 cards
                     print(self.community_cards[:3])
                     self.revealed_cards.append(self.community_cards[:3])
                     # print(self.get_highest_combi(self.revealed_cards,self.cards))
-                    self.gui.set_table_cards(self.revealed_cards)
+                    # self.gui.set_table_cards(self.revealed_cards)
                 elif instruction[0] == 'g':  # reveal 4. card
                     print(self.community_cards[3])
                     self.revealed_cards.append(self.community_cards[3])
                     # print(self.get_highest_combi(self.revealed_cards, self.cards))
-                    self.gui.set_table_cards(self.revealed_cards)
+                    # self.gui.set_table_cards(self.revealed_cards)
                 elif instruction[0] == 'h':  # reveal 5. card
                     print(self.community_cards[4])
                     self.revealed_cards.append(self.community_cards[4])
                     # print(self.get_highest_combi(self.revealed_cards, self.cards))
-                    self.gui.set_table_cards(self.revealed_cards)
+                    # self.gui.set_table_cards(self.revealed_cards)
                 elif instruction[0] == 'i':  # update
-                    self.update()
+                    pass
+                    # self.update()
                 elif instruction[0] == 'j':  # show winner
                     winner_name = json.loads(instruction[1:])
                     print(winner_name, 'win!')
@@ -115,5 +115,5 @@ class User(Socket_function, Rules):
 
 
 if __name__ == '__main__':
-    user = User('172.16.0.36')
+    user = User('192.168.100.7')
     user.run()
