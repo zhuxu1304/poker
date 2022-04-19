@@ -1,13 +1,17 @@
 from tkinter import *
 import socket
 from PIL import Image,ImageTk
-from random_deck import *
+#from random_deck import *
 from time import sleep
+from Server import Server
+from threading import Thread
+from client import User
 
 class Poker_Gui():
 
     def __init__(self):
-        cards = get_random_deck(7)
+        cards = [("Kreuz", 2), ("Kreuz", 3), ("Kreuz", 4), ("Kreuz", 5), ("Kreuz", 6), ("Kreuz", 7),
+                      ("Kreuz", 8)]
         self.status_list = ["Call","Raise","Check","Call","Raise","Check"]
         self.card_list_table = cards[:5]
         self.card_list_player = cards[5:7]
@@ -17,7 +21,7 @@ class Poker_Gui():
         self.player_cards = []
         self.table_cards = []
         self.own_money = 0
-        self.open_game_window(6)
+        self.main_menu()
 
     def set_money(self,money_list):
         for i,label in enumerate(self.money_labels):
@@ -81,8 +85,9 @@ class Poker_Gui():
         Label_name = Label(host_window,text="Enter Name:",font="Arial 20 bold",foreground="white",bg="#303030")
         Label_name.place(relx=0.5,rely=0.35,anchor=CENTER)
 
-        input_name = Entry(host_window,font="Arial 20",justify=CENTER)
-        input_name.place(relx=0.5,rely=0.45,anchor=CENTER)
+        self.user_input = StringVar()
+        self.input_name = Entry(host_window,font="Arial 20",justify=CENTER,textvariable=self.user_input)
+        self.input_name.place(relx=0.5,rely=0.45,anchor=CENTER)
 
         Label_player = Label(host_window,text="Enter number of players:",font="Arial 20 bold",foreground="white",bg="#303030")
         Label_player.place(relx=0.5,rely=0.55,anchor=CENTER)
@@ -102,7 +107,21 @@ class Poker_Gui():
         Back_button = Button(host_window,text="Back",font="Arial 20",command=lambda:[host_window.destroy(),self.main_menu()])
         Back_button.place(relx=0.5,rely=0.9,anchor=CENTER)
 
+
+        
+        self.serv = Server(6)
+        self.user = User('172.16.0.36')
+        #print(type(input_name.get()))
+        thread2 = Thread(target = self.serv.run)
+        thread1 = Thread(target = self.user.run)
+        
+        thread2.start()
+        thread1.start()
         host_window.mainloop()
+        print(123)
+
+        
+        
         
 
 
@@ -131,8 +150,8 @@ class Poker_Gui():
         Label_name = Label(join_window,text="Enter Name:",font="Arial 20 bold",foreground="white",bg="#303030")
         Label_name.place(relx=0.5,rely=0.45,anchor=CENTER)
 
-        input_name = Entry(join_window,font="Arial 20",justify=CENTER)
-        input_name.place(relx=0.5,rely=0.55,anchor=CENTER)
+        self.input_name = Entry(join_window,font="Arial 20",justify=CENTER)
+        self.input_name.place(relx=0.5,rely=0.55,anchor=CENTER)
 
         connect_button = Button(join_window,text="Connect",font="Arial 20")
         connect_button.place(relx=0.5,rely=0.65,anchor=CENTER)
@@ -250,6 +269,7 @@ class Poker_Gui():
         self.pot_money.place(relx=0.5,rely=0.65,anchor=CENTER)
 
         #Mainloop
+        print(self.user_name.get())
         game_window.mainloop()
 
     # To DO
