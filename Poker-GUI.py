@@ -21,6 +21,9 @@ class Poker_Gui():
         self.player_cards = []
         self.table_cards = []
         self.own_money = 0
+        self.player_name = ""
+        self.numb_players = 0
+        self.ip_adress_server = ""
         self.main_menu()
 
     def set_money(self,money_list):
@@ -59,7 +62,15 @@ class Poker_Gui():
         for i,element in enumerate(card_images_table):
             self.table_cards[i].configure(image=element)
             self.table_cards[i].image = element
-        
+    
+    def set_player_input(self):
+        self.player_name = self.user_input.get()
+        self.numb_players = self.var.get()
+
+
+    def set_input_join(self):
+        self.player_name = self.user_name.get()
+        self.ip_adress_server = self.input_ip.get()
 
 
 
@@ -85,6 +96,7 @@ class Poker_Gui():
         Label_name = Label(host_window,text="Enter Name:",font="Arial 20 bold",foreground="white",bg="#303030")
         Label_name.place(relx=0.5,rely=0.35,anchor=CENTER)
 
+        # Input Name
         self.user_input = StringVar()
         self.input_name = Entry(host_window,font="Arial 20",justify=CENTER,textvariable=self.user_input)
         self.input_name.place(relx=0.5,rely=0.45,anchor=CENTER)
@@ -92,16 +104,18 @@ class Poker_Gui():
         Label_player = Label(host_window,text="Enter number of players:",font="Arial 20 bold",foreground="white",bg="#303030")
         Label_player.place(relx=0.5,rely=0.55,anchor=CENTER)
 
+
+        # Select player number
         option_list = [2,3,4,5,6]
 
-        var = StringVar(host_window)
-        var.set(option_list[0])
+        self.var = StringVar(host_window)
+        self.var.set(option_list[0])
 
-        input_player = OptionMenu(host_window,var,*option_list)
+        input_player = OptionMenu(host_window,self.var,*option_list)
         input_player.config(width=10, font=("Arial",20),relief="solid")
         input_player.place(relx=0.5,rely=0.65,anchor=CENTER)
 
-        connect_button = Button(host_window,text="Run",font="Arial 20",command=lambda:[host_window.destroy(),self.open_game_window(int(var.get()))])
+        connect_button = Button(host_window,text="Run",font="Arial 20",command=lambda:[self.set_player_input(),host_window.destroy(),self.open_game_window(int(self.var.get()))])
         connect_button.place(relx=0.5,rely=0.8,anchor=CENTER)
 
         Back_button = Button(host_window,text="Back",font="Arial 20",command=lambda:[host_window.destroy(),self.main_menu()])
@@ -144,16 +158,19 @@ class Poker_Gui():
         Label_server_ip = Label(join_window,text="Enter Host IP:",font="Arial 20 bold",foreground="white",bg="#303030")
         Label_server_ip.place(relx=0.5,rely=0.25,anchor=CENTER)
 
-        input_server_ip = Entry(join_window,font="Arial 20",justify=CENTER)
+        self.input_ip = StringVar()
+        input_server_ip = Entry(join_window,font="Arial 20",justify=CENTER,textvariable=self.input_ip)
         input_server_ip.place(relx=0.5,rely=0.35,anchor=CENTER)
 
+        
         Label_name = Label(join_window,text="Enter Name:",font="Arial 20 bold",foreground="white",bg="#303030")
         Label_name.place(relx=0.5,rely=0.45,anchor=CENTER)
 
-        self.input_name = Entry(join_window,font="Arial 20",justify=CENTER)
+        self.user_name = StringVar()
+        self.input_name = Entry(join_window,font="Arial 20",justify=CENTER,textvariable=self.user_name)
         self.input_name.place(relx=0.5,rely=0.55,anchor=CENTER)
 
-        connect_button = Button(join_window,text="Connect",font="Arial 20")
+        connect_button = Button(join_window,text="Connect",font="Arial 20",command=lambda:[self.set_input_join(),join_window.destroy(),self.open_game_window(6)])
         connect_button.place(relx=0.5,rely=0.65,anchor=CENTER)
 
         Back_button = Button(join_window,text="Back",font="Arial 20",command=lambda:[join_window.destroy(),self.main_menu()])
@@ -269,7 +286,7 @@ class Poker_Gui():
         self.pot_money.place(relx=0.5,rely=0.65,anchor=CENTER)
 
         #Mainloop
-        print(self.user_name.get())
+        #print(self.user_name.get())
         game_window.mainloop()
 
     # To DO
