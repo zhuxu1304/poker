@@ -1,3 +1,4 @@
+import sys
 import threading
 from tkinter import *
 import socket
@@ -31,6 +32,8 @@ class Poker_Gui(Socket_function):
         self.ip_adress_server = ""
         self.queueCG = Queue()
         self.queueGC = Queue()
+        self.server = None
+        self.client = None
         self.main_menu()
 
     def set_money(self, money_list):
@@ -203,7 +206,8 @@ class Poker_Gui(Socket_function):
 
     def update(self, game_window):  # [name_list, money_list, status_list, pot, table_cards, player_cards]
         self.index = None
-        while True:
+        self.flag = True
+        while self.flag:
             last = None
             while not self.queueCG.empty():
                 last = self.queueCG.get()
@@ -356,10 +360,21 @@ class Poker_Gui(Socket_function):
         self.pot_money = Label(game_window, text="Pot Money: 0$", font="Arial 20", foreground="white", bg="#393939")
         self.pot_money.place(relx=0.5, rely=0.65, anchor=CENTER)
 
-        # Mainloop
+        # Mainloop2
         # print(self.user_name.get())
+
+        game_window.protocol("WM_DELETE_WINDOW", func=lambda:self.on_closing(game_window))
         game_window.mainloop()
 
+    def on_closing(self,game_window):
+        if self.server:
+            self.process_server.terminate()
+            del self.process_server
+        self.process_client.terminate()
+        del self.process_client
+        self.flag = False
+        game_window.destroy()
+        sys.exit()
     # To DO
     # small blind, big blind, dealer Button
     # menu select start money automatic adapt small/big blind
