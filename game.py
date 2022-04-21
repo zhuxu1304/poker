@@ -341,5 +341,6 @@ class Game(Rules):
             self.cards = self.backup_cards[:]
             for i in range(len(self.players)):
                 self.status_list[i] = ''
+                self.money_list[i] += 100
             self.send_to_all_player('a')
             self.update()

@@ -313,7 +313,7 @@ class Poker_Gui(Socket_function):
         # Button for Call, Raise, Check, Fold, Quit
         # Quit
         Quit_Button = Button(game_window, text="Quit", font="Arial 20",
-                             command=lambda: [game_window.destroy(), self.main_menu()])
+                             command=lambda: [self.on_closing(game_window), self.main_menu()])
         Quit_Button.place(relx=0.05, rely=0.95, anchor=CENTER, height=55)
 
         def check_call():
@@ -369,12 +369,11 @@ class Poker_Gui(Socket_function):
     def on_closing(self,game_window):
         if self.server:
             self.process_server.terminate()
-            del self.process_server
+            del self.server
         self.process_client.terminate()
-        del self.process_client
+        del self.client
         self.flag = False
         game_window.destroy()
-        sys.exit()
     # To DO
     # small blind, big blind, dealer Button
     # menu select start money automatic adapt small/big blind
