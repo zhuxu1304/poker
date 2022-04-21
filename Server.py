@@ -12,7 +12,7 @@ class Server(Socket_function):
     def __init__(self, player_number):
         print(1)
         self.welcome_socket = socket.socket()
-        self.welcome_socket.bind(('', 5005))
+        self.welcome_socket.bind(('', 15505))
         self.welcome_socket.listen(10)
         self.player_number = player_number
         self.game = Game()
@@ -26,7 +26,19 @@ class Server(Socket_function):
         self.game.add_player(Player(free_port))
         print('added')
 
+    def send_player_number(self):
+        self.number_socket = socket.socket()
+        self.number_socket.bind(('',15506))
+        self.number_socket.listen(10)
+        while True:
+            komm_s, adress = self.number_socket.accept()
+            self.sendeStr(komm_s,str(self.player_number))
+            komm_s.close()
+
     def run(self):
+        # open number socket
+        t_number = threading.Thread(target=self.send_player_number)
+        t_number.start()
 
         # welcome server
         players = 0
@@ -46,6 +58,4 @@ class Server(Socket_function):
         self.game.run()
 
 
-if __name__ == '__main__':
-    serv = Server(5)
-    serv.run()
+
