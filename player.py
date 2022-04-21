@@ -15,7 +15,6 @@ class Player(Socket_function):
         self.port = port
         self.s.listen(1)
         self.komm_s, self.adress = self.s.accept()
-        self.sendeStr(self.komm_s, "what's your name?")
         self.name = self.empfangeStr(self.komm_s)
         # self.sendeStr(self.komm_s, "waiting for other players")
 

@@ -1,3 +1,3 @@
 from pokergui import Poker_Gui
-
-gui = Poker_Gui()
+if __name__ == '__main__':
+    gui = Poker_Gui()
