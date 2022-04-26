@@ -28,7 +28,7 @@ class User(Socket_function, Rules):
 
         print('client open')
         s = socket.socket()
-        s.connect((self.ip, 15505))
+        s.connect((self.ip, 55555))
         port = int(self.empfangeStr(s))
         # print(port)
         time.sleep(0.1)

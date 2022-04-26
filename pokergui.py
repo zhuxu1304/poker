@@ -66,14 +66,14 @@ class Poker_Gui(Socket_function):
             for i, element in enumerate(self.player_cards):
                 element.configure(image=card_images_player[i])
                 element.image = card_images_player[i]
-    def set_current(self,current_list,label_list):
+    def set_current(self,current_list):
         for i,each in enumerate(current_list):
             if each:
                 player_image = PhotoImage(file="player1_your_turn.png")
             else:
                 player_image = PhotoImage(file="player1.png")
-            label_list[i].configure(image=player_image)
-            label_list[i].image = player_image
+            self.label_list[i].configure(image=player_image)
+            self.label_list[i].image = player_image
             
 
     def set_table_cards(self, card_list, game_window):
@@ -108,7 +108,7 @@ class Poker_Gui(Socket_function):
 
     def set_client(self, ip):
         komm_s = socket.socket()
-        komm_s.connect((ip, 15506))
+        komm_s.connect((ip, 55556))
         self.player_number = int(self.empfangeStr(komm_s))  # should ask server how many players
         self.side = 'client'
 
@@ -228,7 +228,7 @@ class Poker_Gui(Socket_function):
                     self.index = name_list.index(self.player_name)
                     time.sleep(0.1)
 
-                self.set_current(current_list[self.index:] + current_list[:self.index],self.label_list[self.index:] + self.label_list[:self.index])
+                self.set_current(current_list[self.index:] + current_list[:self.index])
                 self.set_names(name_list[self.index:] + name_list[:self.index])
                 self.set_money(money_list[self.index:] + money_list[:self.index])
                 self.set_status(status_list[self.index:] + status_list[:self.index])
