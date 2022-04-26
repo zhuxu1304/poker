@@ -66,6 +66,15 @@ class Poker_Gui(Socket_function):
             for i, element in enumerate(self.player_cards):
                 element.configure(image=card_images_player[i])
                 element.image = card_images_player[i]
+    def set_current(self,current_list,label_list):
+        for i,each in enumerate(current_list):
+            if each:
+                player_image = PhotoImage(file="player1_your_turn.png")
+            else:
+                player_image = PhotoImage(file="player1.png")
+            label_list[i].configure(image=player_image)
+            label_list[i].image = player_image
+            
 
     def set_table_cards(self, card_list, game_window):
         if card_list:
@@ -213,11 +222,13 @@ class Poker_Gui(Socket_function):
                 last = self.queueCG.get()
                 print('got', last)
             if last:
-                name_list, money_list, status_list, pot, table_cards, player_cards = last[0], last[1], last[2], last[3], \
-                                                                                     last[4], last[5]
+                name_list, money_list, status_list, current_list, pot, table_cards, player_cards = last[0], last[1], last[2], last[3], \
+                                                                                     last[4], last[5], last[6]
                 if not self.index:
                     self.index = name_list.index(self.player_name)
                     time.sleep(0.1)
+
+                self.set_current(current_list[self.index:] + current_list[:self.index],self.label_list[self.index:] + self.label_list[:self.index])
                 self.set_names(name_list[self.index:] + name_list[:self.index])
                 self.set_money(money_list[self.index:] + money_list[:self.index])
                 self.set_status(status_list[self.index:] + status_list[:self.index])
@@ -258,9 +269,11 @@ class Poker_Gui(Socket_function):
         # player_coords = [(43,500),(43,5),(1040,500),(1040,20),(540,0),(540,520)]
         player_coords = [(500, 520), (500, 0), (23, 20), (970, 20), (23, 500), (970, 500)]
         player_image = PhotoImage(file="player1.png")
+        self.label_list = []
         for i in range(0, number_of_players):
             player_label = Label(game_window, image=player_image, bg="white")
             player_label.place(x=player_coords[i][0], y=player_coords[i][1])
+            self.label_list.append(player_label)
 
         # Placing Money Labels
         money_coords = [(650, 555), (650, 35), (175, 55), (1120, 55), (175, 535), (1120, 535)]
