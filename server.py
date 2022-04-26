@@ -12,7 +12,7 @@ class Server(Socket_function):
     def __init__(self, player_number):
         print(1)
         self.welcome_socket = socket.socket()
-        self.welcome_socket.bind(('', 15505))
+        self.welcome_socket.bind(('', 55555))
         self.welcome_socket.listen(10)
         self.player_number = player_number
         self.game = Game()
@@ -28,7 +28,7 @@ class Server(Socket_function):
 
     def send_player_number(self):
         self.number_socket = socket.socket()
-        self.number_socket.bind(('',15506))
+        self.number_socket.bind(('',55556))
         self.number_socket.listen(10)
         while True:
             komm_s, adress = self.number_socket.accept()

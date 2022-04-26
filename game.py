@@ -26,13 +26,16 @@ class Game(Rules):
         self.current_bet = 0
         self.community_cards = []
         self.name_list = []
-
+        self.current_list = []
         self.money_list = []
         self.status_list = []
+        self.flag = False
         for p in self.players:
             self.name_list.append(p.name)
             self.money_list.append(p.money)
             self.status_list.append('')
+
+        
 
     def add_player(self, player):
         self.players.append(player)
@@ -70,6 +73,8 @@ class Game(Rules):
         self.current_player = self.current_players.index(small_blind)
         end = self.current_player
         while True:
+            self.current_list[self.players.index(self.current_players[self.current_player])] = True
+            self.update()
             action = self.current_players[self.current_player].ask_for_action(self.current_bet)
             if action[0] == 'call':
                 index = self.players.index(self.current_players[self.current_player])
@@ -130,8 +135,8 @@ class Game(Rules):
                 self.status_list[index] = 'fold'
                 del self.current_players[self.current_player]
                 self.current_player -= 1
+            self.current_list[self.players.index(self.current_players[self.current_player])] = False
             self.update()
-
             self.set_next_player()
             print('player and end', self.current_player, end)
             if self.current_player == end or len(self.current_players) == 1:
@@ -141,8 +146,12 @@ class Game(Rules):
             self.winner = self.current_players[0]
 
     def update(self):
+        if not self.flag:
+            for i in self.players:
+                self.current_list.append(False)
+            self.flag = True
         # send each player [name_list, money_list, status_list, pot, table_cards]
-        self.send_to_all_player('i' + json.dumps([self.name_list, self.money_list, self.status_list, self.pot]))
+        self.send_to_all_player('i' + json.dumps([self.name_list, self.money_list, self.status_list, self.current_list, self.pot]))
 
     def clear_status(self):
         for i in range(len(self.status_list)):
@@ -202,6 +211,8 @@ class Game(Rules):
             self.current_bet = 50
             flag1 = False
             while self.current_player != end and len(self.current_players) != 1:
+                self.current_list[self.players.index(self.current_players[self.current_player])] = True
+                self.update()
                 action = self.current_players[self.current_player].ask_for_action_firstround(self.current_bet)
                 print(action, action[0])
                 if action[0] == 'call':
@@ -258,8 +269,8 @@ class Game(Rules):
                     self.status_list[index] = 'fold'
                     del self.current_players[self.current_player]
                     self.current_player -= 1
+                self.current_list[self.players.index(self.current_players[self.current_player])] = False
                 self.update()
-
                 self.set_next_player()
                 print('current player', self.current_player, 'end', end)
             if len(self.current_players) == 1:
