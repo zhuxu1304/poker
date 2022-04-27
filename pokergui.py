@@ -260,6 +260,9 @@ class Poker_Gui(Socket_function):
 
         game_window.title("Coffee-Poker - Game")
 
+        
+
+
         # Background
         background_image = ImageTk.PhotoImage(Image.open("pokertisch1.png"))
         background_label = Label(game_window, image=background_image)
@@ -373,6 +376,15 @@ class Poker_Gui(Socket_function):
         self.pot_money = Label(game_window, text="Pot Money: 0$", font="Arial 20", foreground="white", bg="#393939")
         self.pot_money.place(relx=0.5, rely=0.65, anchor=CENTER)
 
+        #Dealer Buttons
+##        button_coords = [(500+220, 520+30), (500+220, 0+30), (23+220, 20+30), (970-45, 20+30), (23+220, 500+30), (970-45, 500+30)]
+##        for i in range(len(button_coords)):
+##            dealer_image = ImageTk.PhotoImage(file='dealer_button.png')
+##            dealer_label = Canvas(width=50, height=50,bg = 'yellow')
+##            dealer_label.place(x=button_coords[i][0],y = button_coords[i][1])
+##            dealer_label.create_image(1.5, 1.5, image=dealer_image, anchor='nw')
+        
+
         # Mainloop2
         # print(self.user_name.get())
 
@@ -419,6 +431,7 @@ class Poker_Gui(Socket_function):
                              command=lambda: [welcome_window.destroy(), self.open_host_window()])
 
         Host_button.place(relx=0.5, rely=0.7, anchor=CENTER, width=250)
+        
 
         welcome_window.mainloop()
 
