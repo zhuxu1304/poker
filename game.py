@@ -30,6 +30,8 @@ class Game(Rules):
         self.money_list = []
         self.status_list = []
         self.flag = False
+        self.set_buttons = True
+        self.button_list = []
         for p in self.players:
             self.name_list.append(p.name)
             self.money_list.append(p.money)
@@ -151,7 +153,7 @@ class Game(Rules):
                 self.current_list.append(False)
             self.flag = True
         # send each player [name_list, money_list, status_list, pot, table_cards]
-        self.send_to_all_player('i' + json.dumps([self.name_list, self.money_list, self.status_list, self.current_list, self.pot]))
+        self.send_to_all_player('i' + json.dumps([self.name_list, self.money_list, self.status_list, self.current_list, self.pot,self.set_buttons,self.button_list]))
 
     def clear_status(self):
         for i in range(len(self.status_list)):
@@ -170,13 +172,22 @@ class Game(Rules):
             # tell each player to start
             self.send_to_all_player('start')
             # send each player [name_list, money_list, status_list, pot,table_cards, own_money]
-            self.update()
 
             # set button, small and big blind+
             button = self.players[self.button]
             small_blind = self.get_next_player(self.button)
             big_blind = self.get_next_player(self.get_next_player(self.button))
-
+            self.button_list = []
+            for i in range(len(self.players)):
+                if i == self.button:
+                    self.button_list.append('d')
+                elif i == small_blind:
+                    self.button_list.append('s')
+                elif i == big_blind:
+                    self.button_list.append('b')
+                else:
+                    self.button_list.append(None)
+            self.set_buttons = 'set'
             # small and big blind pay in the pot+
             # self.players[small_blind].change_money(-25)
             self.money_list[small_blind] -= 25
@@ -186,6 +197,7 @@ class Game(Rules):
             self.pot += 50
             self.update()
             print('small and big blind done')
+
 
             # add player to current_player+
             self.current_players = self.players[:]
@@ -202,7 +214,7 @@ class Game(Rules):
                 player.set_cards(cards)
             print('player cards send')
             self.update()
-
+            #self.set_buttons = False
             # set first player and first round ask for action+
             self.winner = None
             self.current_player = big_blind
@@ -344,6 +356,7 @@ class Game(Rules):
             for i in range(len(self.players)):
                 if self.status_list[i] != 'win!!':
                     self.status_list[i] = ''
+            self.set_buttons = 'clear'
             self.update()
             time.sleep(5)
             # reset pot, choose new button
@@ -354,4 +367,5 @@ class Game(Rules):
                 self.status_list[i] = ''
                 self.money_list[i] += 100
             self.send_to_all_player('a')
+
             self.update()

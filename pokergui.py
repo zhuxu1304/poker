@@ -36,6 +36,29 @@ class Poker_Gui(Socket_function):
         self.client = None
         self.main_menu()
 
+    def set_buttons(self, gamewindow, flag, pos_list):  # [dealer,small blind, big blind]
+        print('setting...',flag,pos_list)
+        if flag == 'set':
+
+            for i, each in enumerate(pos_list):
+                if not each:
+                    continue
+                if each == 'b':
+                    print('big blind')
+                    image = ImageTk.PhotoImage(file='big_blind.png')
+                elif each == 's':
+                    print('small blind')
+                    image = ImageTk.PhotoImage(file='small_blind.png')
+                else:
+                    print('dealer')
+                    image = ImageTk.PhotoImage(file='dealer_button.png')
+                self.player_buttons_list[i].create_image(1.5, 1.5, image=image, anchor='nw')
+                self.player_buttons_list[i].image = image
+        elif flag == 'clear':
+            print('cleaning...')
+            for i, each in enumerate(pos_list):
+                self.player_buttons_list[i].delete('all')
+
     def set_money(self, money_list):
         for i, label in enumerate(self.money_labels):
             label['text'] = str(money_list[i]) + "$"
@@ -66,15 +89,15 @@ class Poker_Gui(Socket_function):
             for i, element in enumerate(self.player_cards):
                 element.configure(image=card_images_player[i])
                 element.image = card_images_player[i]
-    def set_current(self,current_list):
-        for i,each in enumerate(current_list):
+
+    def set_current(self, current_list):
+        for i, each in enumerate(current_list):
             if each:
                 player_image = PhotoImage(file="player1_your_turn.png")
             else:
                 player_image = PhotoImage(file="player1.png")
             self.label_list[i].configure(image=player_image)
             self.label_list[i].image = player_image
-            
 
     def set_table_cards(self, card_list, game_window):
         if card_list:
@@ -222,8 +245,9 @@ class Poker_Gui(Socket_function):
                 last = self.queueCG.get()
                 print('got', last)
             if last:
-                name_list, money_list, status_list, current_list, pot, table_cards, player_cards = last[0], last[1], last[2], last[3], \
-                                                                                     last[4], last[5], last[6]
+                name_list, money_list, status_list, current_list, pot, op, button_list, table_cards, player_cards = \
+                    last[0], last[1], last[2], last[3], \
+                    last[4], last[5], last[6], last[7], last[8]
                 if not self.index:
                     self.index = name_list.index(self.player_name)
                     time.sleep(0.1)
@@ -236,6 +260,7 @@ class Poker_Gui(Socket_function):
                 self.set_own_money(money_list[self.index])
                 self.set_table_cards(table_cards, game_window)
                 self.set_player_cards(player_cards, game_window)
+                self.set_buttons(game_window, op, button_list[self.index:] + button_list[:self.index])
             time.sleep(0.1)
 
     def wrap_update(self, game_window):
@@ -259,9 +284,6 @@ class Poker_Gui(Socket_function):
         game_window.geometry('1200x720')
 
         game_window.title("Coffee-Poker - Game")
-
-        
-
 
         # Background
         background_image = ImageTk.PhotoImage(Image.open("pokertisch1.png"))
@@ -376,22 +398,29 @@ class Poker_Gui(Socket_function):
         self.pot_money = Label(game_window, text="Pot Money: 0$", font="Arial 20", foreground="white", bg="#393939")
         self.pot_money.place(relx=0.5, rely=0.65, anchor=CENTER)
 
-        #Dealer Buttons
-##        button_coords = [(500+220, 520+30), (500+220, 0+30), (23+220, 20+30), (970-45, 20+30), (23+220, 500+30), (970-45, 500+30)]
-##        for i in range(len(button_coords)):
-##            dealer_image = ImageTk.PhotoImage(file='dealer_button.png')
-##            dealer_label = Canvas(width=50, height=50,bg = 'yellow')
-##            dealer_label.place(x=button_coords[i][0],y = button_coords[i][1])
-##            dealer_label.create_image(1.5, 1.5, image=dealer_image, anchor='nw')
-        
+        # Dealer Buttons
+        ##        button_coords = [(500+220, 520+30), (500+220, 0+30), (23+220, 20+30), (970-45, 20+30), (23+220, 500+30), (970-45, 500+30)]
+        ##        for i in range(len(button_coords)):
+        ##            dealer_image = ImageTk.PhotoImage(file='dealer_button.png')
+        ##            dealer_label = Canvas(width=50, height=50,bg = 'yellow')
+        ##            dealer_label.place(x=button_coords[i][0],y = button_coords[i][1])
+        ##            dealer_label.create_image(1.5, 1.5, image=dealer_image, anchor='nw')
 
         # Mainloop2
         # print(self.user_name.get())
+        # place buttons
+        button_coords = [(500 + 220, 520 + 30), (500 + 220, 0 + 30), (23 + 220, 20 + 30), (970 - 45, 20 + 30),
+                         (23 + 220, 500 + 30), (970 - 45, 500 + 30)]
+        self.player_buttons_list = []
+        for i in range(0, number_of_players):
+            label = Canvas(game_window, width=50, height=50, bg='white')
+            label.place(x=button_coords[i][0], y=button_coords[i][1])
+            self.player_buttons_list.append(label)
 
-        game_window.protocol("WM_DELETE_WINDOW", func=lambda:self.on_closing(game_window))
+        game_window.protocol("WM_DELETE_WINDOW", func=lambda: self.on_closing(game_window))
         game_window.mainloop()
 
-    def on_closing(self,game_window):
+    def on_closing(self, game_window):
         if self.server:
             self.process_server.terminate()
             del self.server
@@ -399,6 +428,7 @@ class Poker_Gui(Socket_function):
         del self.client
         self.flag = False
         game_window.destroy()
+
     # To DO
     # small blind, big blind, dealer Button
     # menu select start money automatic adapt small/big blind
@@ -431,9 +461,9 @@ class Poker_Gui(Socket_function):
                              command=lambda: [welcome_window.destroy(), self.open_host_window()])
 
         Host_button.place(relx=0.5, rely=0.7, anchor=CENTER, width=250)
-        
 
         welcome_window.mainloop()
 
-if __name__ =='__main__':
+
+if __name__ == '__main__':
     gui = Poker_Gui()
