@@ -5,12 +5,12 @@ import socket
 from PIL import Image, ImageTk
 # from random_deck import *
 from time import sleep
-from server import Server
+from modules.server import Server
 from threading import Thread
-from client import User
+from modules.client import User
 from multiprocessing import Process, Queue
 import time
-from socket_functions import *
+from modules.socket_functions import *
 
 
 class Poker_Gui(Socket_function):
@@ -45,13 +45,13 @@ class Poker_Gui(Socket_function):
                     continue
                 if each == 'b':
                     print('big blind')
-                    image = ImageTk.PhotoImage(file='big_blind.png')
+                    image = ImageTk.PhotoImage(file='images/big_blind.png')
                 elif each == 's':
                     print('small blind')
-                    image = ImageTk.PhotoImage(file='small_blind.png')
+                    image = ImageTk.PhotoImage(file='images/small_blind.png')
                 else:
                     print('dealer')
-                    image = ImageTk.PhotoImage(file='dealer_button.png')
+                    image = ImageTk.PhotoImage(file='images/dealer_button.png')
                 self.player_buttons_list[i].create_image(1.5, 1.5, image=image, anchor='nw')
                 self.player_buttons_list[i].image = image
         elif flag == 'clear':
@@ -93,9 +93,9 @@ class Poker_Gui(Socket_function):
     def set_current(self, current_list):
         for i, each in enumerate(current_list):
             if each:
-                player_image = PhotoImage(file="player1_your_turn.png")
+                player_image = PhotoImage(file="images/player1_your_turn.png")
             else:
-                player_image = PhotoImage(file="player1.png")
+                player_image = PhotoImage(file="images/player1.png")
             self.label_list[i].configure(image=player_image)
             self.label_list[i].image = player_image
 
@@ -146,7 +146,7 @@ class Poker_Gui(Socket_function):
 
         host_window.title("Coffee-Poker - Host a Game")
 
-        background_image = PhotoImage(file="welcome_background1.png")
+        background_image = PhotoImage(file="images/welcome_background1.png")
         background_label = Label(host_window, image=background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -200,7 +200,7 @@ class Poker_Gui(Socket_function):
 
         join_window.title("Coffee-Poker - Join a Game")
 
-        background_image = PhotoImage(file="welcome_background1.png")
+        background_image = PhotoImage(file="images/welcome_background1.png")
         background_label = Label(join_window, image=background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -286,14 +286,14 @@ class Poker_Gui(Socket_function):
         game_window.title("Coffee-Poker - Game")
 
         # Background
-        background_image = ImageTk.PhotoImage(Image.open("pokertisch1.png"))
+        background_image = ImageTk.PhotoImage(Image.open("images/pokertisch1.png"))
         background_label = Label(game_window, image=background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         # Placing Player icons
         # player_coords = [(43,500),(43,5),(1040,500),(1040,20),(540,0),(540,520)]
         player_coords = [(500, 520), (500, 0), (23, 20), (970, 20), (23, 500), (970, 500)]
-        player_image = PhotoImage(file="player1.png")
+        player_image = PhotoImage(file="images/player1.png")
         self.label_list = []
         for i in range(0, number_of_players):
             player_label = Label(game_window, image=player_image, bg="white")
@@ -443,7 +443,7 @@ class Poker_Gui(Socket_function):
 
         welcome_window.title("Coffee-Poker")
 
-        background_image = PhotoImage(file="welcome_background1.png")
+        background_image = PhotoImage(file="images/welcome_background1.png")
         background_label = Label(welcome_window, image=background_image)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 

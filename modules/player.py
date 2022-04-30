@@ -1,4 +1,4 @@
-from socket_functions import Socket_function
+from modules.socket_functions import Socket_function
 import socket
 import json
 

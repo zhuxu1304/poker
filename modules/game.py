@@ -1,8 +1,8 @@
 import json
 import time
 from random import choice
-from rules import Rules
-from socket_functions import Socket_function
+from modules.rules import Rules
+from modules.socket_functions import Socket_function
 
 
 class Game(Rules):
