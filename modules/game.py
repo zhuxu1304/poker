@@ -37,8 +37,6 @@ class Game(Rules):
             self.money_list.append(p.money)
             self.status_list.append('')
 
-        
-
     def add_player(self, player):
         self.players.append(player)
 
@@ -140,7 +138,7 @@ class Game(Rules):
             self.current_list[self.players.index(self.current_players[self.current_player])] = False
             self.update()
             self.set_next_player()
-            print('player and end', self.current_player, end)
+            # print('player and end', self.current_player, end)
             if self.current_player == end or len(self.current_players) == 1:
                 break
 
@@ -153,7 +151,9 @@ class Game(Rules):
                 self.current_list.append(False)
             self.flag = True
         # send each player [name_list, money_list, status_list, pot, table_cards]
-        self.send_to_all_player('i' + json.dumps([self.name_list, self.money_list, self.status_list, self.current_list, self.pot,self.set_buttons,self.button_list]))
+        self.send_to_all_player('i' + json.dumps(
+            [self.name_list, self.money_list, self.status_list, self.current_list, self.pot, self.set_buttons,
+             self.button_list]))
 
     def clear_status(self):
         for i in range(len(self.status_list)):
@@ -196,8 +196,7 @@ class Game(Rules):
             self.money_list[big_blind] -= 50
             self.pot += 50
             self.update()
-            print('small and big blind done')
-
+            # print('small and big blind done')
 
             # add player to current_player+
             self.current_players = self.players[:]
@@ -205,16 +204,16 @@ class Game(Rules):
             # deliever community cards+
             self.cards, self.community_cards = self.get_random_deck(self.cards, 5)
             self.send_to_all_player('b' + json.dumps(self.community_cards))
-            print('cummunity cards send')
+            # print('cummunity cards send')
             self.update()
 
             # give each player two cards+
             for player in self.players:
                 self.cards, cards = self.get_random_deck(self.cards, 2)
                 player.set_cards(cards)
-            print('player cards send')
+            # print('player cards send')
             self.update()
-            #self.set_buttons = False
+            # self.set_buttons = False
             # set first player and first round ask for action+
             self.winner = None
             self.current_player = big_blind
@@ -226,7 +225,7 @@ class Game(Rules):
                 self.current_list[self.players.index(self.current_players[self.current_player])] = True
                 self.update()
                 action = self.current_players[self.current_player].ask_for_action_firstround(self.current_bet)
-                print(action, action[0])
+                # (action, action[0])
                 if action[0] == 'call':
                     index = self.players.index(self.current_players[self.current_player])
                     if self.money_list[index] == 0:
@@ -284,16 +283,14 @@ class Game(Rules):
                 self.current_list[self.players.index(self.current_players[self.current_player])] = False
                 self.update()
                 self.set_next_player()
-                print('current player', self.current_player, 'end', end)
+                # print('current player', self.current_player, 'end', end)
             if len(self.current_players) == 1:
                 self.winner = self.current_players[0]
-            print('1. round done')
-
-
+            # print('1. round done')
 
             if not self.winner:
                 # reveal 3 cards+
-                print(self.community_cards[:3])
+                # print(self.community_cards[:3])
                 self.send_to_all_player('f')
                 self.update()
                 time.sleep(1)
@@ -302,11 +299,11 @@ class Game(Rules):
 
                 # second round ask for action+
                 self.ask_all_players_for_action()
-            print('2. round done')
+            # print('2. round done')
 
             if not self.winner:
                 # reveal 1 card+
-                print(self.community_cards[3])
+                # print(self.community_cards[3])
                 self.send_to_all_player('g')
                 self.update()
                 time.sleep(1)
@@ -314,10 +311,10 @@ class Game(Rules):
                 self.update()
                 # third round ask for action+
                 self.ask_all_players_for_action()
-            print('3. round done')
+            # print('3. round done')
             if not self.winner:
                 # reveal 1 card+
-                print(self.community_cards[4])
+                # print(self.community_cards[4])
                 self.send_to_all_player('h')
                 self.update()
                 time.sleep(1)
@@ -325,27 +322,27 @@ class Game(Rules):
                 self.update()
                 # fourth round ask for action+
                 self.ask_all_players_for_action()
-            print('4. round done')
+            # print('4. round done')
             if not self.winner:
                 winner = []
                 for player in self.current_players:
                     winner.append((player, self.get_highest_combi(player.cards, self.community_cards)))
-                print(winner)
+                # print(winner)
                 winner.sort(key=lambda x: x[1][2], reverse=True)
-                print(winner)
+                # print(winner)
                 max_score = winner[0][1][2]
-                print(max_score)
+                # print(max_score)
                 zw = []
                 for each in winner:
                     if each[1][2] == max_score:
                         zw.append(each)
                 winner = zw
-                print(winner)
+                # print(winner)
             else:
                 winner = [(self.winner, 0)]
-            print('winner found')
+            # print('winner found')
             # announce winner, give him money in pot
-            print('pot:', self.pot)
+            # print('pot:', self.pot)
             time.sleep(1)
             self.clear_status()
             self.update()
