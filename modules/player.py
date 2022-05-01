@@ -18,14 +18,11 @@ class Player(Socket_function):
         self.name = self.empfangeStr(self.komm_s)
         # self.sendeStr(self.komm_s, "waiting for other players")
 
-        print(self.name)
+        # print(self.name)
 
     def set_cards(self, cards):
         self.cards = cards
         self.send('c' + json.dumps(self.cards))
-
-    def run(self):
-        print(self.name, self.empfangeStr(self.komm_s))
 
     def send(self, message):
         self.sendeStr(self.komm_s, str(message))
@@ -39,7 +36,7 @@ class Player(Socket_function):
     def change_money(self, amount):
         self.money += amount
         self.send('a' + str(self.get_money()))
-        print('money changed')
+        # print('money changed')
 
     def ask_for_action(self, bet):
         self.send('e' + str(bet))
