@@ -5,6 +5,8 @@ import socket
 from PIL import Image, ImageTk
 # from random_deck import *
 from time import sleep
+
+from matplotlib import image
 from modules.server import Server
 from threading import Thread
 from modules.client import User
@@ -137,6 +139,42 @@ class Poker_Gui(Socket_function):
 
     def set_server(self):
         self.side = 'server'
+
+    def winner_window(self,winning_cards,player="PlayerXY",combination="Straight"):
+        winner_window = Tk()
+        winner_window['bg'] = "white"
+        winner_window.geometry("680x400")
+        winner_window.title("Winner announcement")
+
+        # Used for placing images with a certain margin between
+        t=70
+        # init list of images
+        images = []
+
+        # Winner text: "PlayerXY won with Combination"
+        player_Label = Label(winner_window,text=str(player+" won with "+combination),font="Arial 25 bold",bg="white")
+        player_Label.place(relx=0.5,rely=0.1,anchor=CENTER)
+
+        # Frame to Center all cards in window no matter how many
+        card_frame = Frame(winner_window,bg="dimgrey",width=str(130*len(winning_cards)+10),height="200")
+        card_frame.place(relx=0.5,rely=0.5,anchor=CENTER)
+        
+        # filling list of images
+        for element in winning_cards:
+            images.append(ImageTk.PhotoImage(Image.open("cards/" + str(element) + ".png").resize((120, 180), Image.ANTIALIAS)))
+        
+        # Placing images in Lables
+        for i in range(0,len(images)):
+            winning_cards_Label = Label(card_frame,image=images[i],bg="#4f1800")
+            winning_cards_Label.place(x=t,rely=0.5,anchor=CENTER)
+            t+=130
+        
+        # Okay button to destroy Winner Window
+        buttn = Button(winner_window,text="Okay",font="Arial 20 bold",command=winner_window.destroy)
+        buttn.place(relx=0.5,rely=0.9,anchor=CENTER)
+
+        # Mainloop
+        winner_window.mainloop()
 
     def open_host_window(self):
 
