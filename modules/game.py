@@ -31,6 +31,7 @@ class Game(Rules):
         self.status_list = []
         self.flag = False
         self.set_buttons = True
+        self.winner = None
         self.button_list = []
         for p in self.players:
             self.name_list.append(p.name)
@@ -147,13 +148,19 @@ class Game(Rules):
 
     def update(self):
         if not self.flag:
+            self.current_list = []
             for i in self.players:
                 self.current_list.append(False)
             self.flag = True
         # send each player [name_list, money_list, status_list, pot, table_cards]
+        print('update winner',self.winner)
+        if self.winner and type(self.winner[0][0]) != str:
+            for i,each in enumerate(self.winner):
+                new_winner = [each[0].name , each[1]]
+                self.winner[i] = new_winner
         self.send_to_all_player('i' + json.dumps(
             [self.name_list, self.money_list, self.status_list, self.current_list, self.pot, self.set_buttons,
-             self.button_list, self.winner]))
+             self.button_list,self.winner] ))
 
     def clear_status(self):
         for i in range(len(self.status_list)):
@@ -172,7 +179,10 @@ class Game(Rules):
             # tell each player to start
             self.send_to_all_player('start')
             # send each player [name_list, money_list, status_list, pot,table_cards, own_money]
+            # reset all lists
             self.winner = None
+            self.flag = False
+            self.update()
 
             # set button, small and big blind+
             button = self.players[self.button]
@@ -222,7 +232,7 @@ class Game(Rules):
             end = big_blind
             self.current_bet = 50
             flag1 = False
-            while self.current_player != end and len(self.current_players) != 1:
+            while self.current_player != end and len(self.current_players) > 1:
                 self.current_list[self.players.index(self.current_players[self.current_player])] = True
                 self.update()
                 action = self.current_players[self.current_player].ask_for_action_firstround(self.current_bet)
@@ -282,6 +292,7 @@ class Game(Rules):
                     del self.current_players[self.current_player]
                     self.current_player -= 1
                 self.current_list[self.players.index(self.current_players[self.current_player])] = False
+                print(self.current_players)
                 self.update()
                 self.set_next_player()
                 # print('current player', self.current_player, 'end', end)
@@ -337,11 +348,14 @@ class Game(Rules):
                 for each in winner:
                     if each[1][2] == max_score:
                         zw.append(each)
-                winner = zw
+                self.winner = zw
+                winner = self.winner[:]
 
             else:
-                winner = [(self.winner, self.get_highest_combi(self.winner.cards, self.community_cards))]
-            print(winner)
+                self.winner = [(self.winner, self.get_highest_combi(self.winner.cards, self.community_cards))]
+                winner = self.winner[:]
+
+            print('winner',self.winner)
             # print('winner found')
             # announce winner, give him money in pot
             # print('pot:', self.pot)
@@ -349,6 +363,7 @@ class Game(Rules):
             self.clear_status()
             self.update()
             for player in winner:
+                print(self.players)
                 index = self.players.index(player[0])
                 self.money_list[index] += self.pot // len(winner)
                 self.status_list[index] = 'win!!'
