@@ -39,25 +39,25 @@ class Poker_Gui(Socket_function):
         self.main_menu()
 
     def set_buttons(self, gamewindow, flag, pos_list):  # [dealer,small blind, big blind]
-        #print('setting...',flag,pos_list)
+        # print('setting...',flag,pos_list)
         if flag == 'set':
 
             for i, each in enumerate(pos_list):
                 if not each:
                     continue
                 if each == 'b':
-                    #print('big blind')
+                    # print('big blind')
                     image = ImageTk.PhotoImage(file='images/big_blind.png')
                 elif each == 's':
-                    #print('small blind')
+                    # print('small blind')
                     image = ImageTk.PhotoImage(file='images/small_blind.png')
                 else:
-                    #print('dealer')
+                    # print('dealer')
                     image = ImageTk.PhotoImage(file='images/dealer_button.png')
                 self.player_buttons_list[i].create_image(1.5, 1.5, image=image, anchor='nw')
                 self.player_buttons_list[i].image = image
         elif flag == 'clear':
-            #print('cleaning...')
+            # print('cleaning...')
             for i, each in enumerate(pos_list):
                 self.player_buttons_list[i].delete('all')
 
@@ -281,11 +281,11 @@ class Poker_Gui(Socket_function):
             last = None
             while not self.queueCG.empty():
                 last = self.queueCG.get()
-                #print('got', last)
+                # print('got', last)
             if last:
-                name_list, money_list, status_list, current_list, pot, op, button_list, table_cards, player_cards = \
+                name_list, money_list, status_list, current_list, pot, op, button_list, winner, table_cards, player_cards = \
                     last[0], last[1], last[2], last[3], \
-                    last[4], last[5], last[6], last[7], last[8]
+                    last[4], last[5], last[6], last[7], last[8], last[9]
                 if not self.index:
                     self.index = name_list.index(self.player_name)
                     time.sleep(0.1)
