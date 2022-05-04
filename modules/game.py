@@ -153,7 +153,7 @@ class Game(Rules):
                 self.current_list.append(False)
             self.flag = True
         # send each player [name_list, money_list, status_list, pot, table_cards]
-        print('update winner',self.winner)
+        #print('update winner',self.winner)
         if self.winner and type(self.winner[0][0]) != str:
             for i,each in enumerate(self.winner):
                 new_winner = [each[0].name , each[1]]
@@ -292,7 +292,7 @@ class Game(Rules):
                     del self.current_players[self.current_player]
                     self.current_player -= 1
                 self.current_list[self.players.index(self.current_players[self.current_player])] = False
-                print(self.current_players)
+                #print(self.current_players)
                 self.update()
                 self.set_next_player()
                 # print('current player', self.current_player, 'end', end)
@@ -355,7 +355,7 @@ class Game(Rules):
                 self.winner = [(self.winner, self.get_highest_combi(self.winner.cards, self.community_cards))]
                 winner = self.winner[:]
 
-            print('winner',self.winner)
+            #print('winner',self.winner)
             # print('winner found')
             # announce winner, give him money in pot
             # print('pot:', self.pot)
@@ -363,7 +363,8 @@ class Game(Rules):
             self.clear_status()
             self.update()
             for player in winner:
-                print(self.players)
+                #
+                # print(self.players)
                 index = self.players.index(player[0])
                 self.money_list[index] += self.pot // len(winner)
                 self.status_list[index] = 'win!!'

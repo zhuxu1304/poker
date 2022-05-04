@@ -1,12 +1,8 @@
-import sys
 import threading
 from tkinter import *
 import socket
 from PIL import Image, ImageTk
-# from random_deck import *
 from time import sleep
-
-from matplotlib import image
 from modules.server import Server
 from threading import Thread
 from modules.client import User
@@ -39,25 +35,25 @@ class Poker_Gui(Socket_function):
         self.main_menu()
 
     def set_buttons(self, gamewindow, flag, pos_list):  # [dealer,small blind, big blind]
-        # print('setting...',flag,pos_list)
+        #print('setting...',flag,pos_list)
         if flag == 'set':
 
             for i, each in enumerate(pos_list):
                 if not each:
                     continue
                 if each == 'b':
-                    # print('big blind')
+                    #print('big blind')
                     image = ImageTk.PhotoImage(file='images/big_blind.png')
                 elif each == 's':
-                    # print('small blind')
+                    #print('small blind')
                     image = ImageTk.PhotoImage(file='images/small_blind.png')
                 else:
-                    # print('dealer')
+                    #print('dealer')
                     image = ImageTk.PhotoImage(file='images/dealer_button.png')
                 self.player_buttons_list[i].create_image(1.5, 1.5, image=image, anchor='nw')
                 self.player_buttons_list[i].image = image
         elif flag == 'clear':
-            # print('cleaning...')
+            #print('cleaning...')
             for i, each in enumerate(pos_list):
                 self.player_buttons_list[i].delete('all')
 
@@ -140,8 +136,8 @@ class Poker_Gui(Socket_function):
     def set_server(self):
         self.side = 'server'
 
-    def winner_window(self,winning_cards,player="PlayerXY",combination="Straight"):
-        winner_window = Tk()
+    def winner_window(self,winning_cards=[("Kreuz", 2), ("Kreuz", 3), ("Kreuz", 4)],player="PlayerXY",combination="Straight"):
+        winner_window = Toplevel()
         winner_window['bg'] = "white"
         winner_window.geometry("680x400")
         winner_window.title("Winner announcement")
@@ -149,7 +145,7 @@ class Poker_Gui(Socket_function):
         # Used for placing images with a certain margin between
         t=70
         # init list of images
-        images = []
+        self.images_winner = []
 
         # Winner text: "PlayerXY won with Combination"
         player_Label = Label(winner_window,text=str(player+" won with "+combination),font="Arial 25 bold",bg="white")
@@ -159,13 +155,13 @@ class Poker_Gui(Socket_function):
         card_frame = Frame(winner_window,bg="dimgrey",width=str(130*len(winning_cards)+10),height="200")
         card_frame.place(relx=0.5,rely=0.5,anchor=CENTER)
         
-        # filling list of images
+        # filling list of card images
         for element in winning_cards:
-            images.append(ImageTk.PhotoImage(Image.open("cards/" + str(element) + ".png").resize((120, 180), Image.ANTIALIAS)))
+            self.images_winner.append(ImageTk.PhotoImage(Image.open("cards/" + str(tuple(element)) + ".png").resize((120, 180), Image.ANTIALIAS)))
         
         # Placing images in Lables
-        for i in range(0,len(images)):
-            winning_cards_Label = Label(card_frame,image=images[i],bg="#4f1800")
+        for i in range(0,len(self.images_winner)):
+            winning_cards_Label = Label(card_frame,image=self.images_winner[i],bg="white")
             winning_cards_Label.place(x=t,rely=0.5,anchor=CENTER)
             t+=130
         
@@ -174,7 +170,7 @@ class Poker_Gui(Socket_function):
         buttn.place(relx=0.5,rely=0.9,anchor=CENTER)
 
         # Mainloop
-        winner_window.mainloop()
+        #winner_window.mainloop()
 
     def open_host_window(self):
 
@@ -281,7 +277,7 @@ class Poker_Gui(Socket_function):
             last = None
             while not self.queueCG.empty():
                 last = self.queueCG.get()
-                # print('got', last)
+                #print('got', last)
             if last:
                 name_list, money_list, status_list, current_list, pot, op, button_list, winner, table_cards, player_cards = \
                     last[0], last[1], last[2], last[3], \
@@ -289,6 +285,14 @@ class Poker_Gui(Socket_function):
                 if not self.index:
                     self.index = name_list.index(self.player_name)
                     time.sleep(0.1)
+                if status_list.count("win!!") != 0:
+                    if status_list.count("win!!") == 1:
+                        t = threading.Thread(target=self.winner_window,args=(winner[0][1][1],winner[0][0],winner[0][1][0]))
+                        t.start()
+                    else:
+                        t = threading.Thread(target=self.winner_window,args=(winner[0][1][1],"Everybody",winner[0][1][0]))
+                        t.start()
+                        
 
                 self.set_current(current_list[self.index:] + current_list[:self.index])
                 self.set_names(name_list[self.index:] + name_list[:self.index])
@@ -299,6 +303,7 @@ class Poker_Gui(Socket_function):
                 self.set_table_cards(table_cards, game_window)
                 self.set_player_cards(player_cards, game_window)
                 self.set_buttons(game_window, op, button_list[self.index:] + button_list[:self.index])
+
             time.sleep(0.1)
 
     def wrap_update(self, game_window):
@@ -451,7 +456,7 @@ class Poker_Gui(Socket_function):
                          (23 + 220, 500 + 30), (970 - 45, 500 + 30)]
         self.player_buttons_list = []
         for i in range(0, number_of_players):
-            label = Canvas(game_window, width=50, height=50, bg='white')
+            label = Canvas(game_window, width=52, height=52,bg="white",highlightthickness=0)
             label.place(x=button_coords[i][0], y=button_coords[i][1])
             self.player_buttons_list.append(label)
 
@@ -468,11 +473,9 @@ class Poker_Gui(Socket_function):
         game_window.destroy()
 
     # To DO
-    # small blind, big blind, dealer Button
     # menu select start money automatic adapt small/big blind
     # winner of the round screen
-    # (half done) update function for player connected and money etc.
-    # Class -> finish setter methodes
+    # fix problems with status image
 
     def main_menu(self):
         welcome_window = Tk()
