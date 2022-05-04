@@ -153,7 +153,7 @@ class Game(Rules):
         # send each player [name_list, money_list, status_list, pot, table_cards]
         self.send_to_all_player('i' + json.dumps(
             [self.name_list, self.money_list, self.status_list, self.current_list, self.pot, self.set_buttons,
-             self.button_list]))
+             self.button_list, self.winner]))
 
     def clear_status(self):
         for i in range(len(self.status_list)):
@@ -172,6 +172,7 @@ class Game(Rules):
             # tell each player to start
             self.send_to_all_player('start')
             # send each player [name_list, money_list, status_list, pot,table_cards, own_money]
+            self.winner = None
 
             # set button, small and big blind+
             button = self.players[self.button]
@@ -215,7 +216,7 @@ class Game(Rules):
             self.update()
             # self.set_buttons = False
             # set first player and first round ask for action+
-            self.winner = None
+
             self.current_player = big_blind
             self.set_next_player()
             end = big_blind
@@ -337,9 +338,10 @@ class Game(Rules):
                     if each[1][2] == max_score:
                         zw.append(each)
                 winner = zw
-                # print(winner)
+
             else:
-                winner = [(self.winner, 0)]
+                winner = [(self.winner, self.get_highest_combi(self.winner.cards, self.community_cards))]
+            print(winner)
             # print('winner found')
             # announce winner, give him money in pot
             # print('pot:', self.pot)
