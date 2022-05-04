@@ -176,7 +176,7 @@ class Rules():
     # Check for highest Card
 
     def check_for_highcard(self, random_deck):
-        return random_deck[0]
+        return True, random_deck[0]
 
     def get_highest_combi(self, player_deck, table_deck):
         random_deck = player_deck + table_deck
@@ -230,8 +230,8 @@ class Rules():
             ## print("Your highest combination is a One Pair:", check_for_one_pair(random_deck)[1])
 
         else:
-            res = self.check_for_highcard(random_deck)
-            return ('High Card', res, 1 + res[1] / 100)
+            res = self.check_for_highcard(random_deck)[1]
+            return ('High Card', [res], 1 + res[1] / 100)
             ## print("Your highest card is:", check_for_highcard(random_deck))
 
 
