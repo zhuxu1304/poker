@@ -13,30 +13,45 @@ class Rules():
     def sort_cards(self, cards):
         cards.sort(key=lambda x: x[1], reverse=True)
         return cards
+    
+    def remove_double_values(self, random_deck):
+        last = ""
+        without_doubles = []
+        for element in random_deck:
+            if element[1] != last:
+                without_doubles.append(element)
+                last = element[1]
+            else:
+                last = element[1]
+        return without_doubles
 
     def check_for_straight(self, random_deck):
         is_straight = False
         found = []
-        if random_deck[0][1] == random_deck[1][1] + 1 and random_deck[1][1] == random_deck[2][1] + 1 and random_deck[2][
-            1] == random_deck[3][1] + 1 and random_deck[3][1] == random_deck[4][1] + 1:
-            is_straight = True
-            found = random_deck[:5]
-        elif random_deck[1][1] == random_deck[2][1] + 1 and random_deck[2][1] == random_deck[3][1] + 1 and \
-                random_deck[3][1] == random_deck[4][1] + 1 and random_deck[4][1] == random_deck[5][1] + 1:
-            is_straight = True
-            found = random_deck[1:6]
-        elif random_deck[2][1] == random_deck[3][1] + 1 and random_deck[3][1] == random_deck[4][1] + 1 and \
-                random_deck[4][1] == random_deck[5][1] + 1 and random_deck[5][1] == random_deck[6][1] + 1:
-            is_straight = True
-            found = random_deck[2:7]
-        else:
-            is_straight = False
+        i=0
+        t=1
+        random_deck = self.remove_double_values(random_deck)
+        while len(random_deck[i:])>4 and t < 5:
+            last=random_deck[i]
+            t=1
+            for element in random_deck[i:i+5]:
+                if element[1]+1 == last:
+                    t+=1
+                    last = element[1]
+                else:
+                    last = element[1]
 
-        return is_straight, found
+            if t >= 5:
+                is_straight = True
+                found = random_deck[i:i+5]
+            else:
+                i+=1
+
+        return is_straight,found
 
     # Check for flush
 
-    def check_for_flush(self, random_deck):
+    def check_for_flush(self, random_deck,all=False):
         is_flush = False
         found = []
         Kreuz = [item for item in random_deck if item[0] == "Kreuz"]
@@ -55,6 +70,8 @@ class Rules():
         elif len(Karo) >= 5:
             is_flush = True
             found = Karo
+        if not all:
+            found = found[:5]
 
         return is_flush, found
 
@@ -62,16 +79,17 @@ class Rules():
 
     def check_for_royal_flush(self, random_deck):
         is_royal_flush = False
-        if random_deck[0][1] == 14 and random_deck[0][1] == random_deck[1][1] + 1 and random_deck[1][1] == \
-                random_deck[2][1] + 1 and random_deck[2][1] == random_deck[3][1] + 1 and random_deck[3][1] == \
-                random_deck[4][1] + 1:
-            Kreuz = [item for item in random_deck[:5] if item[0] == "Kreuz"]
-            Piek = [item for item in random_deck[:5] if item[0] == "Piek"]
-            Herz = [item for item in random_deck[:5] if item[0] == "Herz"]
-            Karo = [item for item in random_deck[:5] if item[0] == "Karo"]
-            if len(Herz) >= 5 or len(Piek) >= 5 or len(Karo) >= 5 or len(Kreuz) >= 5:
-                is_royal_flush = True
-        return is_royal_flush
+        found = []
+
+        straight_flush = self.check_for_straight_flush(random_deck)
+
+        #print(straight_flush)
+
+        if straight_flush[0] and straight_flush[1][0][1] == 14:
+            is_royal_flush = True
+            found = straight_flush[1]
+
+        return is_royal_flush, found
 
     # Check for Two Pair
 
@@ -118,25 +136,14 @@ class Rules():
     def check_for_straight_flush(self, random_deck):
         is_straight_flush = False
         found = []
-        if random_deck[0][1] == random_deck[1][1] + 1 and random_deck[1][1] == random_deck[2][1] + 1 and random_deck[2][
-            1] == random_deck[3][1] + 1 and random_deck[3][1] == random_deck[4][1] + 1 and \
-                self.check_for_flush(random_deck[:5])[0]:
-            is_straight_flush = True
-            found = random_deck[:5]
-        elif random_deck[1][1] == random_deck[2][1] + 1 and random_deck[2][1] == random_deck[3][1] + 1 and \
-                random_deck[3][1] == random_deck[4][1] + 1 and random_deck[4][1] == random_deck[5][1] + 1 and \
-                self.check_for_flush(random_deck[1:6])[0]:
-            is_straight_flush = True
-            found = random_deck[1:6]
-        elif random_deck[2][1] == random_deck[3][1] + 1 and random_deck[3][1] == random_deck[4][1] + 1 and \
-                random_deck[4][1] == random_deck[5][1] + 1 and random_deck[5][1] == random_deck[6][1] + 1 and \
-                self.check_for_flush(random_deck[2:7])[0]:
-            is_straight_flush = True
-            found = random_deck[2:7]
-        else:
-            is_straight_flush = False
+        
+        flush = self.check_for_flush(random_deck,True)[1]
+        is_straight_flush = self.check_for_straight(flush)[0]
 
-        return is_straight_flush, found
+        if is_straight_flush:
+            found = self.check_for_straight(flush)[1]
+
+        return is_straight_flush, found[:5]
 
     # Check fot Fullhouse
 
@@ -184,8 +191,8 @@ class Rules():
         ##        print("Zufälliges Karten:", random_deck)
         ##        print("Karten sortiert anhand ihrem Wert:", sort_cards(random_deck))
 
-        if self.check_for_royal_flush(random_deck):
-            res = random_deck[:5]
+        if self.check_for_royal_flush(random_deck)[0]:
+            res = self.check_for_royal_flush(random_deck)[1]
             return ("Royal Flush", res, 10 + res[0][1] / 100)
             ## print("Your highest combination is a Royal Flush:", random_deck[:5])
 
@@ -236,9 +243,9 @@ class Rules():
 
 
 if __name__ == '__main__':
-    for i in range(10000):
-        r = Rules()
-        cards = [("Kreuz", 2), ("Kreuz", 3), ("Kreuz", 4), ("Kreuz", 5), ("Kreuz", 6), ("Kreuz", 7),
+    #for i in range(10000):
+    r = Rules()
+    cards = [("Kreuz", 2), ("Kreuz", 3), ("Kreuz", 4), ("Kreuz", 5), ("Kreuz", 6), ("Kreuz", 7),
                  ("Kreuz", 8), ("Kreuz", 9), ("Kreuz", 10), ("Kreuz", 11), ("Kreuz", 12), ("Kreuz", 13),
                  ("Kreuz", 14),
                  ("Karo", 2), ("Karo", 3), ("Karo", 4), ("Karo", 5), ("Karo", 6), ("Karo", 7), ("Karo", 8),
@@ -247,7 +254,9 @@ if __name__ == '__main__':
                  ("Herz", 9), ("Herz", 10), ("Herz", 11), ("Herz", 12), ("Herz", 13), ("Herz", 14),
                  ("Piek", 2), ("Piek", 3), ("Piek", 4), ("Piek", 5), ("Piek", 6), ("Piek", 7), ("Piek", 8),
                  ("Piek", 9), ("Piek", 10), ("Piek", 11), ("Piek", 12), ("Piek", 13), ("Piek", 14)]
-        random_deck = r.get_random_deck(cards, 7)[1]
-        print("Zufälliges Karten:", random_deck)
-        print("Karten sortiert anhand ihrem Wert:", r.sort_cards(random_deck))
-        print(r.get_highest_combi(random_deck, []))
+    #random_deck = r.get_random_deck(cards, 7)[1]
+    random_deck = [("Herz",14),("Herz",10),("Herz",7),("Herz",7),("Herz",7),("Herz",6),("Herz",5)]
+    print("Zufälliges Karten:", random_deck)
+    print("Karten sortiert anhand ihrem Wert:", r.sort_cards(random_deck))
+    #print(r.check_for_straight(random_deck))
+    print(r.get_highest_combi(random_deck, []))
