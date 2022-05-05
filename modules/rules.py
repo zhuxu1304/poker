@@ -190,6 +190,8 @@ class Rules():
         ##        print()
         ##        print("Zufälliges Karten:", random_deck)
         ##        print("Karten sortiert anhand ihrem Wert:", sort_cards(random_deck))
+        random_deck = self.sort_cards(random_deck)
+        player_deck = self.sort_cards(player_deck)
 
         if self.check_for_royal_flush(random_deck)[0]:
             res = self.check_for_royal_flush(random_deck)[1]
@@ -237,7 +239,7 @@ class Rules():
             ## print("Your highest combination is a One Pair:", check_for_one_pair(random_deck)[1])
 
         else:
-            res = self.check_for_highcard(random_deck)[1]
+            res = self.check_for_highcard(player_deck)[1]
             return ('High Card', [res], 1 + res[1] / 100)
             ## print("Your highest card is:", check_for_highcard(random_deck))
 
