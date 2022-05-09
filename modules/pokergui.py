@@ -16,6 +16,7 @@ try:
 except:
     try:
         os.system("pip3 install playsound")
+        print("Playsound was successfully installed please restart")
     except:
         pass
         
