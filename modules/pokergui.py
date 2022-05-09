@@ -366,7 +366,7 @@ class Poker_Gui(Socket_function):
                         t.start()
                         
 
-                self.set_current(current_list[self.index:] + current_list[:self.index],self.index)
+                self.set_current(current_list[self.index:] + current_list[:self.index])
                 self.set_names(name_list[self.index:] + name_list[:self.index])
                 self.set_money(money_list[self.index:] + money_list[:self.index])
                 self.set_status(status_list[self.index:] + status_list[:self.index])
