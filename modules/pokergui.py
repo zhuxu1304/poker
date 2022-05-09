@@ -43,6 +43,7 @@ class Poker_Gui(Socket_function):
         self.queueGC = Queue()
         self.server = None
         self.client = None
+        self.sounds = True
         self.main_menu()
 
     def play_music(self):
@@ -77,6 +78,25 @@ class Poker_Gui(Socket_function):
                 self.play_music()
             except:
                 pass
+    def start_stop_sounds(self):
+        if self.sounds:
+            try:
+                img = ImageTk.PhotoImage(Image.open("images/Speaker_crossed.png").resize((50, 50), Image.ANTIALIAS))
+                self.sound_label.configure(image=img)
+                self.sound_label.image = img
+                self.sounds = False
+            except:
+                pass
+        else:
+            try:
+                img = ImageTk.PhotoImage(Image.open("images/Speaker.png").resize((50, 50), Image.ANTIALIAS))
+                self.sound_label.configure(image=img)
+                self.sound_label.image = img
+                self.sounds = True
+            except:
+                pass
+
+
 
 
     def set_buttons(self, gamewindow, flag, pos_list):  # [dealer,small blind, big blind]
@@ -134,9 +154,16 @@ class Poker_Gui(Socket_function):
                 element.image = card_images_player[i]
 
     def set_current(self, current_list):
+        #print(index_player,current_list)
         for i, each in enumerate(current_list):
             if each:
                 player_image = PhotoImage(file="images/player1_your_turn.png")
+                try:
+                    if self.sounds == True and i == 0:
+                        s = threading.Thread(target=playsound, args=("sounds/beans.mp3",))
+                        s.start()
+                except:
+                    pass
             else:
                 player_image = PhotoImage(file="images/player1.png")
             self.label_list[i].configure(image=player_image)
@@ -339,7 +366,7 @@ class Poker_Gui(Socket_function):
                         t.start()
                         
 
-                self.set_current(current_list[self.index:] + current_list[:self.index])
+                self.set_current(current_list[self.index:] + current_list[:self.index],self.index)
                 self.set_names(name_list[self.index:] + name_list[:self.index])
                 self.set_money(money_list[self.index:] + money_list[:self.index])
                 self.set_status(status_list[self.index:] + status_list[:self.index])
@@ -456,6 +483,11 @@ class Poker_Gui(Socket_function):
         self.music_label = Button(game_window, image=music_icon,bg="#393939",command=self.start_stop_music,border=0)
         self.music_label.place(relx=0.12, rely=0.95, anchor=CENTER)
 
+        #Sound Button
+        sound_icon = ImageTk.PhotoImage(Image.open("images/Speaker.png").resize((50, 50), Image.ANTIALIAS))
+        self.sound_label = Button(game_window, image=sound_icon,bg="#393939",command=self.start_stop_sounds,border=0)
+        self.sound_label.place(relx=0.19, rely=0.95, anchor=CENTER)
+
         # Money
         self.Money_label = Label(game_window, text="Your current money:\n0$", font="Arial 20", foreground="white",
                                  bg="#393939")
@@ -522,6 +554,8 @@ class Poker_Gui(Socket_function):
         self.process_client.terminate()
         del self.client
         self.flag = False
+        if self.is_music:
+            self.music.terminate()
         game_window.destroy()
 
     # To DO
