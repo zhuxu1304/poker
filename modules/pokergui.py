@@ -9,11 +9,16 @@ from modules.client import User
 from multiprocessing import Process, Queue
 import time
 from modules.socket_functions import *
+import os
 
 try:
     from playsound import playsound
 except:
-    pass
+    try:
+        os.system("pip3 install playsound")
+    except:
+        pass
+        
 
 
 class Poker_Gui(Socket_function):
