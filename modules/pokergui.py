@@ -15,7 +15,7 @@ try:
     from playsound import playsound
 except:
     try:
-        os.system("pip3 install playsound")
+        os.system("pip install playsound==1.2.2")
         print("Playsound was successfully installed please restart")
     except:
         pass
@@ -78,6 +78,7 @@ class Poker_Gui(Socket_function):
                 self.play_music()
             except:
                 pass
+
     def start_stop_sounds(self):
         if self.sounds:
             try:
@@ -160,7 +161,7 @@ class Poker_Gui(Socket_function):
                 player_image = PhotoImage(file="images/player1_your_turn.png")
                 try:
                     if self.sounds == True and i == 0:
-                        s = threading.Thread(target=playsound, args=("sounds/beans.mp3",))
+                        s = Process(target=playsound, args=("sounds/beans.mp3",))
                         s.start()
                 except:
                     pass
