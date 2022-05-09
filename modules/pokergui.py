@@ -10,6 +10,11 @@ from multiprocessing import Process, Queue
 import time
 from modules.socket_functions import *
 
+try:
+    from playsound import playsound
+except:
+    pass
+
 
 class Poker_Gui(Socket_function):
 
@@ -33,6 +38,40 @@ class Poker_Gui(Socket_function):
         self.server = None
         self.client = None
         self.main_menu()
+
+    def play_music(self):
+        try:
+            self.music = Process(target=playsound, args=("sounds/background_music.mp3",))
+            self.music.daemon = True
+            self.music.start()
+        except:
+            pass
+
+        self.is_music = True
+    
+    def start_stop_music(self):
+        if self.is_music:
+            try:
+                self.music.terminate()
+            except:
+                pass
+            self.is_music = False
+            try:
+                img = ImageTk.PhotoImage(Image.open("images/music_crossed.png").resize((50, 50), Image.ANTIALIAS))
+                self.music_label.configure(image=img)
+                self.music_label.image = img
+            except:
+                pass
+        else:
+            self.is_music = True 
+            try:
+                img = ImageTk.PhotoImage(Image.open("images/music.png").resize((50, 50), Image.ANTIALIAS))
+                self.music_label.configure(image=img)
+                self.music_label.image = img
+                self.play_music()
+            except:
+                pass
+
 
     def set_buttons(self, gamewindow, flag, pos_list):  # [dealer,small blind, big blind]
         #print('setting...',flag,pos_list)
@@ -313,6 +352,8 @@ class Poker_Gui(Socket_function):
     # Main Window for Poker Game
     def open_game_window(self, number_of_players):
 
+        self.play_music()
+        
         self.client = User(self.ip_adress_server, self.player_name, self.queueCG, self.queueGC)
         self.process_client = Process(target=self.client.run)
         if self.side == 'server':
@@ -394,7 +435,7 @@ class Poker_Gui(Socket_function):
         # Button for Call, Raise, Check, Fold, Quit
         # Quit
         Quit_Button = Button(game_window, text="Quit", font="Arial 20",
-                             command=lambda: [self.on_closing(game_window), self.main_menu()])
+                             command=lambda: [self.start_stop_music(),self.on_closing(game_window), self.main_menu()])
         Quit_Button.place(relx=0.05, rely=0.95, anchor=CENTER, height=55)
 
         def check_call():
@@ -403,6 +444,11 @@ class Poker_Gui(Socket_function):
         # Check/Call
         Check_Button = Button(game_window, text="Check\nCall", font="Arial 15", command=check_call)
         Check_Button.place(relx=0.95, rely=0.95, anchor=CENTER, width=100, height=55)
+
+        #Music Button
+        music_icon = ImageTk.PhotoImage(Image.open("images/music.png").resize((50, 50), Image.ANTIALIAS))
+        self.music_label = Button(game_window, image=music_icon,bg="#393939",command=self.start_stop_music,border=0)
+        self.music_label.place(relx=0.12, rely=0.95, anchor=CENTER)
 
         # Money
         self.Money_label = Label(game_window, text="Your current money:\n0$", font="Arial 20", foreground="white",
@@ -476,6 +522,8 @@ class Poker_Gui(Socket_function):
     # menu select start money automatic adapt small/big blind
     # winner of the round screen
     # fix problems with status image
+
+
 
     def main_menu(self):
         welcome_window = Tk()
