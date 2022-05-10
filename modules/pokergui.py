@@ -13,12 +13,12 @@ import os
 
 try:
     from playsound import playsound
+##except:
+##    try:
+##        os.system("pip install playsound==1.2.2")
+##        print("Playsound was successfully installed please restart")
 except:
-    try:
-        os.system("pip install playsound==1.2.2")
-        print("Playsound was successfully installed please restart")
-    except:
-        pass
+    pass
         
 
 
@@ -555,8 +555,10 @@ class Poker_Gui(Socket_function):
         self.process_client.terminate()
         del self.client
         self.flag = False
-        if self.is_music:
+        try:
             self.music.terminate()
+        except:
+            pass
         game_window.destroy()
 
     # To DO
