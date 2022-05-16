@@ -211,10 +211,10 @@ class Game(Rules):
             # small and big blind pay in the pot+
             # self.players[small_blind].change_money(-25)
             if not self.winner:
-                self.money_list[small_blind] -= 25
+                self.money_list[self.players.index(self.current_players[small_blind])] -= 25
                 self.pot += 25
                 # self.players[big_blind].change_money(-50)
-                self.money_list[big_blind] -= 50
+                self.money_list[self.players.index(self.current_players[big_blind])] -= 50
                 self.pot += 50
                 self.update()
                 # print('small and big blind done')
