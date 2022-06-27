@@ -136,6 +136,8 @@ class Game(Rules):
             else:  # elif action[0] == 'fold':
                 index = self.players.index(self.current_players[self.current_player])
                 self.status_list[index] = 'fold'
+                self.current_list[self.players.index(self.current_players[self.current_player])] = False
+                self.update()
                 del self.current_players[self.current_player]
                 self.current_player -= 1
             self.current_list[self.players.index(self.current_players[self.current_player])] = False
@@ -298,6 +300,9 @@ class Game(Rules):
                 else:  # elif action[0] == 'fold':
                     index = self.players.index(self.current_players[self.current_player])
                     self.status_list[index] = 'fold'
+                    self.current_list[self.players.index(self.current_players[self.current_player])] = False
+                    self.update()
+
                     del self.current_players[self.current_player]
                     self.current_player -= 1
                 self.current_list[self.players.index(self.current_players[self.current_player])] = False
